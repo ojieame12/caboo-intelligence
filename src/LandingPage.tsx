@@ -57,9 +57,9 @@ function LandingPage() {
             <a href="/privacy" className="font-['Inter'] text-[14px] font-[400] text-neutral-600 hover:text-neutral-900 transition-colors">
               Privacy
             </a>
-            <div className="flex items-center gap-2 rounded-full bg-brand-600 px-2 py-1">
-              <Button onClick={() => window.location.href = '#pricing'}>
-                Start for free
+            <div className="flex items-center gap-2 rounded-full bg-brand-600 px-2 py-1 btn-hover-lift">
+              <Button onClick={() => window.location.href = '/signup'}>
+                Start free trial
               </Button>
             </div>
           </div>
@@ -82,7 +82,7 @@ function LandingPage() {
           </div>
           <div className="flex w-full max-w-[1280px] flex-wrap items-center gap-4 animate-fade-in delay-400">
             <div className="flex items-center gap-4 rounded-full bg-brand-600 px-3 py-2 btn-hover-lift">
-              <Button size="large" onClick={() => window.location.href = '#pricing'}>
+              <Button size="large" onClick={() => window.location.href = '/signup'}>
                 Start free 14-day trial
               </Button>
             </div>
@@ -444,7 +444,7 @@ function LandingPage() {
             </div>
 
             <div className="flex items-center gap-4 rounded-full bg-brand-600 px-3 py-2 max-w-[300px] mx-auto mb-4 btn-hover-lift">
-              <Button size="large">
+              <Button size="large" onClick={() => window.location.href = '/signup'}>
                 Start your free trial
               </Button>
             </div>
@@ -625,7 +625,7 @@ function LandingPage() {
           </p>
           <div className="flex flex-col items-center gap-4">
             <div className="flex items-center gap-4 rounded-full bg-brand-600 px-3 py-2 btn-hover-lift">
-              <Button size="large">
+              <Button size="large" onClick={() => window.location.href = '/signup'}>
                 Start your free trial
               </Button>
             </div>
