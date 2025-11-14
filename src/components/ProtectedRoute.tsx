@@ -1,20 +1,24 @@
 import { ReactNode } from 'react'
-import { useAuth } from '@clerk/clerk-react'
 import { Navigate, useLocation } from 'react-router-dom'
+import { useAuthContext } from '@/context/AuthContext'
 
 type ProtectedRouteProps = {
   children: ReactNode
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { isLoaded, userId } = useAuth()
+  const { user, loading } = useAuthContext()
   const location = useLocation()
 
-  if (!isLoaded) {
-    return null
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#FCF6EF]">
+        <p className="font-['Geist'] text-neutral-500 text-sm">Loading...</p>
+      </div>
+    )
   }
 
-  if (!userId) {
+  if (!user) {
     return <Navigate to="/signin" state={{ from: location }} replace />
   }
 

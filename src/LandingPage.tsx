@@ -34,12 +34,29 @@ function LandingPage() {
 
           {/* Right Actions */}
           <div className="flex items-center gap-4">
-            <a
-              href="/signin"
-              className="font-['Inter'] text-[14px] font-[400] text-neutral-600 hover:text-neutral-900 transition-colors"
-            >
-              Sign in
-            </a>
+            {user ? (
+              <>
+                <a
+                  href="/dashboard"
+                  className="font-['Inter'] text-[14px] font-[400] text-neutral-600 hover:text-neutral-900 transition-colors"
+                >
+                  Dashboard
+                </a>
+                <button
+                  onClick={logout}
+                  className="font-['Inter'] text-[14px] font-[400] text-neutral-600 hover:text-brand-600 transition-colors"
+                >
+                  Sign out
+                </button>
+              </>
+            ) : (
+              <a
+                href="/signin"
+                className="font-['Inter'] text-[14px] font-[400] text-neutral-600 hover:text-neutral-900 transition-colors"
+              >
+                Sign in
+              </a>
+            )}
             <div className="flex items-center gap-2 rounded-full bg-brand-600 px-2 py-1 btn-hover-lift">
               <Button onClick={() => window.location.href = '/signup'}>
                 Start free trial
@@ -246,14 +263,16 @@ function LandingPage() {
       </AnimatedSection>
 
       {/* Features */}
-      <div className="w-full py-32 px-6 bg-[#FCF6EF] bg-[url('https://res.cloudinary.com/subframe/image/upload/v1763074076/uploads/13740/yaaf7xczdif74hxwedcb.png')] bg-[right_-10rem_bottom_-10rem] bg-[length:800px] bg-no-repeat">
+      <div className="w-full py-32 px-6 bg-[#FCF6EF] bg-[url('https://res.cloudinary.com/subframe/image/upload/v1763074076/uploads/13740/yaaf7xczdif74hxwedcb.png')] bg-[right_-10rem_bottom_-10rem] bg-[length:1200px] bg-no-repeat">
         <div className="max-w-[1280px] mx-auto">
           <div className="mb-20">
             <h2 className="font-['Season_Mix_TRIAL'] text-[48px] font-[400] leading-[52px] text-neutral-900 mb-6">
-              What's included
+              Built for how you actually work
             </h2>
             <p className="font-['Geist'] text-[18px] font-[300] leading-[30px] text-neutral-600 max-w-[600px]">
-              Everything you need to manage WhatsApp bookings professionally.
+              One subscription includes everything. No add-ons, no complexity,
+              no learning curve. Just intelligent WhatsApp booking management that fits
+              into your restaurant's existing workflow.
             </p>
           </div>
 

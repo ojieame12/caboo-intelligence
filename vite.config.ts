@@ -18,4 +18,12 @@ export default defineConfig({
       '@/subframe': path.resolve(__dirname, './src/subframe'),
     },
   },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:4000',
+        changeOrigin: true,
+      },
+    },
+  },
 })

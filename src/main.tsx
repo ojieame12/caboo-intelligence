@@ -1,15 +1,10 @@
 import { StrictMode } from 'react'
 import { createRoot, hydrateRoot } from 'react-dom/client'
-import { ClerkProvider } from '@clerk/clerk-react'
 import './index.css'
 import App from './App.tsx'
+import { AuthProvider } from './context/AuthContext.tsx'
 
 const isPrerender = typeof navigator !== 'undefined' && navigator.userAgent === 'ReactSnap'
-const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
-
-if (!clerkPubKey && !isPrerender) {
-  throw new Error('Missing VITE_CLERK_PUBLISHABLE_KEY. Set it in your environment variables.')
-}
 
 const container = document.getElementById('root')
 
@@ -19,17 +14,13 @@ if (!container) {
 
 const app = (
   <StrictMode>
-    {isPrerender ? (
+    <AuthProvider>
       <App />
-    ) : (
-      <ClerkProvider publishableKey={clerkPubKey!}>
-        <App />
-      </ClerkProvider>
-    )}
+    </AuthProvider>
   </StrictMode>
 )
 
-if (container.hasChildNodes()) {
+if (container.hasChildNodes() && !isPrerender) {
   hydrateRoot(container, app)
 } else {
   createRoot(container).render(app)

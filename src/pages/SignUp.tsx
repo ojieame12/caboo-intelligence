@@ -1,9 +1,73 @@
-import React from "react";
+import React, { FormEvent, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/subframe/components/Button";
 import { TextField } from "@/subframe/components/TextField";
 import { FeatherCheck } from "@subframe/core";
+import { api } from "@/lib/api";
+import { useAuthContext } from "@/context/AuthContext";
+
+type FormState = {
+  restaurantName: string;
+  ownerName: string;
+  email: string;
+  whatsappNumber: string;
+  password: string;
+};
+
+const initialState: FormState = {
+  restaurantName: "",
+  ownerName: "",
+  email: "",
+  whatsappNumber: "",
+  password: "",
+};
 
 function SignUp() {
+  const [form, setForm] = useState<FormState>(initialState);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const { login } = useAuthContext();
+
+  const handleChange = (field: keyof FormState, value: string) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (loading) return;
+
+    setError(null);
+    setLoading(true);
+
+    try {
+      const response = await api.post<{
+        token: string;
+        user: { id: string; email: string };
+        restaurant: { id: string; name: string; status: string };
+      }>("/api/signup", {
+        restaurantName: form.restaurantName.trim(),
+        ownerName: form.ownerName.trim(),
+        email: form.email.trim(),
+        whatsappNumber: form.whatsappNumber.trim(),
+        password: form.password,
+      });
+
+      login({
+        token: response.token,
+        email: response.user.email,
+        userId: response.user.id,
+        restaurant: response.restaurant,
+      });
+
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to create account right now.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex h-full min-h-screen w-full flex-col items-center bg-default-background">
       {/* Navbar */}
@@ -39,7 +103,7 @@ function SignUp() {
             </p>
           </div>
 
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label className="font-['Geist'] text-[14px] font-medium text-neutral-700 mb-2 block">
                 Restaurant name
@@ -47,6 +111,8 @@ function SignUp() {
               <TextField
                 placeholder="The Waterfront Bistro"
                 className="w-full"
+                value={form.restaurantName}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange("restaurantName", e.target.value)}
               />
             </div>
 
@@ -57,6 +123,8 @@ function SignUp() {
               <TextField
                 placeholder="John Doe"
                 className="w-full"
+                value={form.ownerName}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange("ownerName", e.target.value)}
               />
             </div>
 
@@ -67,6 +135,9 @@ function SignUp() {
               <TextField
                 placeholder="john@restaurant.co.za"
                 className="w-full"
+                type="email"
+                value={form.email}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange("email", e.target.value)}
               />
             </div>
 
@@ -77,6 +148,8 @@ function SignUp() {
               <TextField
                 placeholder="+27 82 123 4567"
                 className="w-full"
+                value={form.whatsappNumber}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange("whatsappNumber", e.target.value)}
               />
               <p className="font-['Geist'] text-[12px] font-[300] text-neutral-500 mt-2">
                 This should be your restaurant's WhatsApp Business number
@@ -91,13 +164,21 @@ function SignUp() {
                 type="password"
                 placeholder="Create a secure password"
                 className="w-full"
+                value={form.password}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange("password", e.target.value)}
               />
             </div>
 
+            {error && (
+              <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3">
+                <p className="font-['Geist'] text-[14px] text-red-600">{error}</p>
+              </div>
+            )}
+
             <div className="pt-4">
               <div className="flex items-center gap-4 rounded-full bg-brand-600 px-2 py-1 mb-4 btn-hover-lift">
-                <Button size="large" className="w-full" onClick={() => window.location.href = '/onboarding/connect'}>
-                  Create account
+                <Button size="large" className="w-full" type="submit" disabled={loading}>
+                  {loading ? "Creating account..." : "Create account"}
                 </Button>
               </div>
             </div>

@@ -1,8 +1,49 @@
-import React from "react";
+import React, { FormEvent, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/subframe/components/Button";
 import { TextField } from "@/subframe/components/TextField";
+import { api } from "@/lib/api";
+import { useAuthContext } from "@/context/AuthContext";
 
 function SignIn() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const { login } = useAuthContext();
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (loading) return;
+    setError(null);
+    setLoading(true);
+
+    try {
+      const response = await api.post<{
+        token: string;
+        user: { id: string; email: string };
+        restaurant: { id: string; name: string; status: string };
+      }>("/api/login", {
+        email: email.trim(),
+        password,
+      });
+
+      login({
+        token: response.token,
+        email: response.user.email,
+        userId: response.user.id,
+        restaurant: response.restaurant,
+      });
+
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to sign in.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex h-full min-h-screen w-full flex-col items-center bg-default-background">
       {/* Navbar */}
@@ -38,7 +79,7 @@ function SignIn() {
             </p>
           </div>
 
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label className="font-['Geist'] text-[14px] font-medium text-neutral-700 mb-2 block">
                 Email address
@@ -46,6 +87,9 @@ function SignIn() {
               <TextField
                 placeholder="john@restaurant.co.za"
                 className="w-full"
+                type="email"
+                value={email}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
               />
             </div>
 
@@ -57,6 +101,8 @@ function SignIn() {
                 type="password"
                 placeholder="Enter your password"
                 className="w-full"
+                value={password}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
               />
               <div className="flex items-center justify-end mt-2">
                 <a href="/forgot-password" className="font-['Geist'] text-[12px] font-[300] text-brand-600 hover:underline">
@@ -65,10 +111,16 @@ function SignIn() {
               </div>
             </div>
 
+            {error && (
+              <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3">
+                <p className="font-['Geist'] text-[14px] text-red-600">{error}</p>
+              </div>
+            )}
+
             <div className="pt-4">
               <div className="flex items-center gap-4 rounded-full bg-brand-600 px-2 py-1 btn-hover-lift">
-                <Button size="large" className="w-full">
-                  Sign in
+                <Button size="large" className="w-full" type="submit" disabled={loading}>
+                  {loading ? "Signing in..." : "Sign in"}
                 </Button>
               </div>
             </div>
