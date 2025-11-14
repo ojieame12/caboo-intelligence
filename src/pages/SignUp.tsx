@@ -1,7 +1,7 @@
 import React, { FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/subframe/components/Button";
-import { TextField } from "@/subframe/components/TextField";
+import { AnimatedInput, validators } from "@/components/AnimatedInput";
 import { FeatherCheck } from "@subframe/core";
 import { api } from "@/lib/api";
 import { useAuthContext } from "@/context/AuthContext";
@@ -103,69 +103,56 @@ function SignUp() {
             </p>
           </div>
 
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <div>
-              <label className="font-['Geist'] text-[14px] font-medium text-neutral-700 mb-2 block">
-                Restaurant name
-              </label>
-              <TextField
-                placeholder="The Waterfront Bistro"
-                className="w-full"
+          <form className="space-y-8" onSubmit={handleSubmit}>
+            <div className="space-y-8 animate-fade-in-up delay-100">
+              <AnimatedInput
+                label="Restaurant name"
                 value={form.restaurantName}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange("restaurantName", e.target.value)}
+                onChange={(e) => handleChange("restaurantName", e.target.value)}
+                placeholder="The Waterfront Bistro"
+                required
+                validate={validators.required}
               />
-            </div>
 
-            <div>
-              <label className="font-['Geist'] text-[14px] font-medium text-neutral-700 mb-2 block">
-                Your name
-              </label>
-              <TextField
-                placeholder="John Doe"
-                className="w-full"
+              <AnimatedInput
+                label="Your name"
                 value={form.ownerName}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange("ownerName", e.target.value)}
+                onChange={(e) => handleChange("ownerName", e.target.value)}
+                placeholder="John Doe"
+                required
+                validate={validators.required}
               />
-            </div>
 
-            <div>
-              <label className="font-['Geist'] text-[14px] font-medium text-neutral-700 mb-2 block">
-                Email address
-              </label>
-              <TextField
-                placeholder="john@restaurant.co.za"
-                className="w-full"
+              <AnimatedInput
+                label="Email address"
                 type="email"
                 value={form.email}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange("email", e.target.value)}
+                onChange={(e) => handleChange("email", e.target.value)}
+                placeholder="john@restaurant.co.za"
+                required
+                validate={validators.email}
               />
-            </div>
 
-            <div>
-              <label className="font-['Geist'] text-[14px] font-medium text-neutral-700 mb-2 block">
-                WhatsApp Business number
-              </label>
-              <TextField
-                placeholder="+27 82 123 4567"
-                className="w-full"
+              <AnimatedInput
+                label="WhatsApp Business number"
+                type="tel"
                 value={form.whatsappNumber}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange("whatsappNumber", e.target.value)}
+                onChange={(e) => handleChange("whatsappNumber", e.target.value)}
+                placeholder="+27 82 123 4567"
+                required
+                validate={validators.phone}
+                helperText="This should be your restaurant's WhatsApp Business number"
               />
-              <p className="font-['Geist'] text-[12px] font-[300] text-neutral-500 mt-2">
-                This should be your restaurant's WhatsApp Business number
-              </p>
-            </div>
 
-            <div>
-              <label className="font-['Geist'] text-[14px] font-medium text-neutral-700 mb-2 block">
-                Password
-              </label>
-              <TextField
+              <AnimatedInput
+                label="Create password"
                 type="password"
-                placeholder="Create a secure password"
-                className="w-full"
                 value={form.password}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange("password", e.target.value)}
+                onChange={(e) => handleChange("password", e.target.value)}
+                placeholder="At least 8 characters"
+                required
+                validate={validators.password}
+                helperText="Must include uppercase letter and number"
               />
             </div>
 

@@ -1,7 +1,7 @@
 import React, { FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/subframe/components/Button";
-import { TextField } from "@/subframe/components/TextField";
+import { AnimatedInput, validators } from "@/components/AnimatedInput";
 import { api } from "@/lib/api";
 import { useAuthContext } from "@/context/AuthContext";
 
@@ -79,35 +79,32 @@ function SignIn() {
             </p>
           </div>
 
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <div>
-              <label className="font-['Geist'] text-[14px] font-medium text-neutral-700 mb-2 block">
-                Email address
-              </label>
-              <TextField
-                placeholder="john@restaurant.co.za"
-                className="w-full"
+          <form className="space-y-8" onSubmit={handleSubmit}>
+            <div className="space-y-8 animate-fade-in-up delay-100">
+              <AnimatedInput
+                label="Email address"
                 type="email"
                 value={email}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="john@restaurant.co.za"
+                required
+                validate={validators.email}
               />
-            </div>
 
-            <div>
-              <label className="font-['Geist'] text-[14px] font-medium text-neutral-700 mb-2 block">
-                Password
-              </label>
-              <TextField
-                type="password"
-                placeholder="Enter your password"
-                className="w-full"
-                value={password}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-              />
-              <div className="flex items-center justify-end mt-2">
-                <a href="/forgot-password" className="font-['Geist'] text-[12px] font-[300] text-brand-600 hover:underline">
-                  Forgot password?
-                </a>
+              <div className="relative">
+                <AnimatedInput
+                  label="Password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  required
+                />
+                <div className="flex items-center justify-end mt-3">
+                  <a href="/forgot-password" className="font-['Geist'] text-[13px] font-[300] text-brand-600 hover:underline transition-colors">
+                    Forgot password?
+                  </a>
+                </div>
               </div>
             </div>
 

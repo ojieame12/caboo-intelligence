@@ -1,9 +1,22 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/subframe/components/Button";
-import { TextField } from "@/subframe/components/TextField";
-import { TextArea } from "@/subframe/components/TextArea";
+import { AnimatedInput, validators } from "@/components/AnimatedInput";
+import { AnimatedTextArea } from "@/components/AnimatedTextArea";
 
 function Contact() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [restaurant, setRestaurant] = useState("");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    // TODO: Handle form submission
+    console.log({ name, email, restaurant, message });
+  };
+
   return (
     <div className="flex h-full w-full flex-col items-center bg-default-background">
       {/* Navbar */}
@@ -104,51 +117,52 @@ function Contact() {
                 Send a message
               </h2>
 
-              <form className="space-y-6">
-                <div>
-                  <label className="font-['Geist'] text-[14px] font-medium text-neutral-700 mb-2 block">
-                    Your name
-                  </label>
-                  <TextField
+              <form className="space-y-8" onSubmit={handleSubmit}>
+                <div className="space-y-8 animate-fade-in-up delay-100">
+                  <AnimatedInput
+                    label="Your name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
                     placeholder="John Doe"
-                    className="w-full"
+                    required
+                    validate={validators.required}
                   />
-                </div>
 
-                <div>
-                  <label className="font-['Geist'] text-[14px] font-medium text-neutral-700 mb-2 block">
-                    Email address
-                  </label>
-                  <TextField
+                  <AnimatedInput
+                    label="Email address"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     placeholder="john@restaurant.co.za"
-                    className="w-full"
+                    required
+                    validate={validators.email}
                   />
-                </div>
 
-                <div>
-                  <label className="font-['Geist'] text-[14px] font-medium text-neutral-700 mb-2 block">
-                    Restaurant name
-                  </label>
-                  <TextField
+                  <AnimatedInput
+                    label="Restaurant name"
+                    value={restaurant}
+                    onChange={(e) => setRestaurant(e.target.value)}
                     placeholder="Your Restaurant"
-                    className="w-full"
+                    helperText="Optional - helps us assist you better"
                   />
-                </div>
 
-                <div>
-                  <label className="font-['Geist'] text-[14px] font-medium text-neutral-700 mb-2 block">
-                    Message
-                  </label>
-                  <TextArea
+                  <AnimatedTextArea
+                    label="Message"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
                     placeholder="How can we help?"
-                    className="w-full min-h-[120px]"
+                    required
+                    rows={5}
+                    maxLength={500}
                   />
                 </div>
 
-                <div className="flex items-center gap-2 rounded-full bg-brand-600 px-2 py-1">
-                  <Button className="w-full">
-                    Send message
-                  </Button>
+                <div className="pt-4 animate-fade-in delay-200">
+                  <div className="flex items-center gap-2 rounded-full bg-brand-600 px-2 py-1 btn-hover-lift">
+                    <Button type="submit" className="w-full" disabled={loading}>
+                      {loading ? "Sending..." : "Send message"}
+                    </Button>
+                  </div>
                 </div>
               </form>
             </div>
