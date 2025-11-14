@@ -3,8 +3,11 @@ import { Button } from "@/subframe/components/Button";
 import { Accordion } from "@/subframe/components/Accordion";
 import { FeatherCheck, FeatherArrowRight } from "@subframe/core";
 import { AnimatedSection, CountUp } from "./components/AnimatedSection";
+import { useAuthContext } from "./context/AuthContext";
 
 function LandingPage() {
+  const { user, logout } = useAuthContext();
+
   return (
     <div className="flex h-full w-full flex-col items-center bg-default-background">
       {/* Navbar */}
