@@ -12,6 +12,11 @@ if (!container) {
   throw new Error('Root element #root not found')
 }
 
+// Clear fallback HTML before mounting React
+if (container.hasChildNodes()) {
+  container.innerHTML = ''
+}
+
 const app = (
   <StrictMode>
     <AuthProvider>
@@ -20,8 +25,4 @@ const app = (
   </StrictMode>
 )
 
-if (container.hasChildNodes() && !isPrerender) {
-  hydrateRoot(container, app)
-} else {
-  createRoot(container).render(app)
-}
+createRoot(container).render(app)
