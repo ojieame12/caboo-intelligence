@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "@/subframe/components/Button";
 import { Accordion } from "@/subframe/components/Accordion";
 import { FeatherCheck, FeatherArrowRight } from "@subframe/core";
-import { SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
+import { SignedIn, SignedOut, UserButton, SignInButton } from "@clerk/clerk-react";
 
 function LandingPage() {
   return (
@@ -29,9 +29,11 @@ function LandingPage() {
               FAQ
             </a>
             <SignedOut>
-              <a href="/signin" className="font-['Inter'] text-[14px] font-[500] text-neutral-900 hover:text-brand-600 transition-colors">
-                Sign in
-              </a>
+              <SignInButton mode="modal" afterSignInUrl="/dashboard">
+                <button className="font-['Inter'] text-[14px] font-[500] text-neutral-900 hover:text-brand-600 transition-colors">
+                  Sign in
+                </button>
+              </SignInButton>
             </SignedOut>
             <SignedIn>
               <UserButton appearance={{ elements: { avatarBox: "w-9 h-9" } }} afterSignOutUrl="/" />
@@ -40,9 +42,11 @@ function LandingPage() {
 
           <div className="flex items-center gap-3">
             <SignedOut>
-              <a href="/signin" className="font-['Inter'] text-[14px] font-[500] text-neutral-900 hover:text-brand-600 transition-colors md:hidden">
-                Sign in
-              </a>
+              <SignInButton mode="modal" afterSignInUrl="/dashboard">
+                <button className="font-['Inter'] text-[14px] font-[500] text-neutral-900 hover:text-brand-600 transition-colors md:hidden">
+                  Sign in
+                </button>
+              </SignInButton>
             </SignedOut>
             <SignedIn>
               <div className="md:hidden">
