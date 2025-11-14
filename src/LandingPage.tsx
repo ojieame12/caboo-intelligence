@@ -259,6 +259,7 @@ function LandingPage() {
             </p>
           </div>
         </div>
+        </div>
       </AnimatedSection>
 
       {/* Features */}
@@ -449,6 +450,7 @@ function LandingPage() {
             </div>
           </div>
         </div>
+        </div>
       </AnimatedSection>
 
       {/* FAQ */}
@@ -607,6 +609,7 @@ function LandingPage() {
               </div>
             </Accordion>
           </div>
+        </div>
         </div>
       </AnimatedSection>
 
