@@ -12,6 +12,8 @@ import Processing from './pages/onboarding/Processing'
 import Settings from './pages/onboarding/Settings'
 import Success from './pages/onboarding/Success'
 import Dashboard from './pages/Dashboard'
+import Bookings from './pages/dashboard/Bookings'
+import DashboardSettings from './pages/dashboard/Settings'
 import Billing from './pages/Billing'
 import Integrations from './pages/Integrations'
 import StoreInfo from './pages/StoreInfo'
@@ -38,6 +40,22 @@ function App() {
           element={
             <ProtectedRoute>
               <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/bookings"
+          element={
+            <ProtectedRoute>
+              <Bookings />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/settings"
+          element={
+            <ProtectedRoute>
+              <DashboardSettings />
             </ProtectedRoute>
           }
         />
