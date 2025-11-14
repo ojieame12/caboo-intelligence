@@ -7,12 +7,13 @@ import { useAuthContext } from "./context/AuthContext";
 
 function LandingPage() {
   const { user, logout } = useAuthContext();
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   return (
     <div className="flex h-full w-full flex-col items-center bg-default-background">
       {/* Navbar */}
       <div className="w-full border-b border-neutral-border bg-white sticky top-0 z-50 backdrop-blur-sm bg-white/90">
-        <div className="flex w-full max-w-[1280px] mx-auto items-center justify-between px-6 py-4">
+        <div className="flex w-full max-w-[1280px] mx-auto items-center justify-between px-4 md:px-6 py-4">
           {/* Logo */}
           <a href="/" className="flex h-12 flex-col items-start justify-center gap-2">
             <img
@@ -35,8 +36,23 @@ function LandingPage() {
             </a>
           </nav>
 
-          {/* Right Actions */}
-          <div className="flex items-center gap-4">
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 text-neutral-600 hover:text-neutral-900 transition-colors"
+            aria-label="Toggle menu"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {mobileMenuOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
+
+          {/* Right Actions - Desktop */}
+          <div className="hidden md:flex items-center gap-4">
             {user ? (
               <>
                 <a
@@ -67,29 +83,72 @@ function LandingPage() {
             </div>
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-neutral-200 animate-fade-in">
+            <nav className="flex flex-col p-4 space-y-4">
+              <a href="#what-is-caboo" onClick={() => setMobileMenuOpen(false)} className="font-['Inter'] text-[15px] font-[400] text-neutral-700 py-2">
+                How It Works
+              </a>
+              <a href="#pricing" onClick={() => setMobileMenuOpen(false)} className="font-['Inter'] text-[15px] font-[400] text-neutral-700 py-2">
+                Pricing
+              </a>
+              <a href="#faq" onClick={() => setMobileMenuOpen(false)} className="font-['Inter'] text-[15px] font-[400] text-neutral-700 py-2">
+                FAQ
+              </a>
+              <div className="border-t border-neutral-200 pt-4">
+                {user ? (
+                  <>
+                    <a href="/dashboard" className="font-['Inter'] text-[15px] font-[400] text-neutral-700 py-2 block">
+                      Dashboard
+                    </a>
+                    <button onClick={() => { logout(); setMobileMenuOpen(false); }} className="font-['Inter'] text-[15px] font-[400] text-brand-600 py-2 w-full text-left">
+                      Sign out
+                    </button>
+                  </>
+                ) : (
+                  <a href="/signin" className="font-['Inter'] text-[15px] font-[400] text-neutral-700 py-2 block">
+                    Sign in
+                  </a>
+                )}
+                <div className="mt-4">
+                  <div className="flex items-center gap-2 rounded-full bg-brand-600 px-2 py-1 btn-hover-lift">
+                    <Button onClick={() => window.location.href = '/signup'} className="w-full">
+                      Start free trial
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </nav>
+          </div>
+        )}
       </div>
 
       {/* Hero Section */}
-      <div className="w-full px-6 py-6">
-        <div className="flex h-144 w-full flex-none flex-col items-center justify-center gap-8 rounded-2xl px-6 py-2 bg-[#FCF6EF] bg-[url('https://res.cloudinary.com/subframe/image/upload/v1763068410/uploads/13740/bhhmezdkrjimc9edtafq.png')] bg-[right_9rem_top_-9rem] bg-[length:600px] bg-no-repeat">
-          <div className="flex w-full max-w-[1280px] flex-col items-start gap-6">
-            <h1 className="whitespace-pre-wrap font-['Season_Mix_TRIAL'] text-[56px] font-[400] leading-[60px] text-neutral-900 animate-fade-in">
+      <div className="w-full px-4 md:px-6 py-4 md:py-6">
+        <div className="flex min-h-[500px] md:h-144 w-full flex-col items-center justify-center gap-6 md:gap-8 rounded-2xl px-4 md:px-6 py-12 md:py-2 bg-[#FCF6EF] bg-none md:bg-[url('https://res.cloudinary.com/subframe/image/upload/v1763068410/uploads/13740/bhhmezdkrjimc9edtafq.png')] md:bg-[right_9rem_top_-9rem] md:bg-[length:600px] bg-no-repeat">
+          <div className="flex w-full max-w-[1280px] flex-col items-start gap-4 md:gap-6">
+            <h1 className="font-['Season_Mix_TRIAL'] text-[36px] md:text-[48px] lg:text-[56px] font-[400] leading-[40px] md:leading-[52px] lg:leading-[60px] text-neutral-900 animate-fade-in">
               {"Your "}
               <span className="text-[#128C7E]">WhatsApp</span>
-              {".\nSmarter bookings.\nHappier customers."}
+              {". "}
+              <span className="block md:inline">Smarter bookings.</span>
+              {" "}
+              <span className="block md:inline">Happier customers.</span>
             </h1>
-            <p className="max-w-[600px] font-['Geist'] text-[20px] font-[300] leading-[32px] tracking-wide text-neutral-600 animate-fade-in delay-200">
+            <p className="max-w-[600px] font-['Geist'] text-[16px] md:text-[18px] lg:text-[20px] font-[300] leading-[26px] md:leading-[30px] lg:leading-[32px] text-neutral-600 animate-fade-in delay-200">
               Automated WhatsApp booking assistant for South African restaurants.
               Never miss a request. Cut no-shows by 91%. Keep your existing number.
             </p>
           </div>
-          <div className="flex w-full max-w-[1280px] flex-wrap items-center gap-4 animate-fade-in delay-400">
-            <div className="flex items-center gap-4 rounded-full bg-brand-600 px-3 py-2 btn-hover-lift">
-              <Button size="large" onClick={() => window.location.href = '/signup'}>
+          <div className="flex w-full max-w-[1280px] flex-col sm:flex-row flex-wrap items-center gap-4 animate-fade-in delay-400">
+            <div className="flex items-center gap-4 rounded-full bg-brand-600 px-3 py-2 btn-hover-lift w-full sm:w-auto">
+              <Button size="large" onClick={() => window.location.href = '/signup'} className="w-full sm:w-auto">
                 Start free 14-day trial
               </Button>
             </div>
-            <span className="font-['Geist'] text-[14px] text-neutral-500">
+            <span className="font-['Geist'] text-[13px] md:text-[14px] text-neutral-500 text-center sm:text-left">
               No credit card required • Setup takes 5 minutes
             </span>
           </div>
@@ -98,19 +157,19 @@ function LandingPage() {
 
       {/* What Caboo Does */}
       <AnimatedSection>
-        <div id="what-is-caboo" className="w-full py-32 px-6 bg-white">
+        <div id="what-is-caboo" className="w-full py-16 md:py-24 lg:py-32 px-4 md:px-6 bg-white">
           <div className="max-w-[1280px] mx-auto">
-            <div className="text-center mb-20">
-              <h2 className="font-['Season_Mix_TRIAL'] text-[48px] font-[400] leading-[52px] text-neutral-900 mb-6">
+            <div className="text-center mb-12 md:mb-16 lg:mb-20">
+              <h2 className="font-['Season_Mix_TRIAL'] text-[32px] md:text-[40px] lg:text-[48px] font-[400] leading-[36px] md:leading-[44px] lg:leading-[52px] text-neutral-900 mb-4 md:mb-6">
                 What Caboo does for your restaurant
               </h2>
-              <p className="font-['Geist'] text-[18px] font-[300] leading-[30px] text-neutral-600 max-w-[700px] mx-auto">
+              <p className="font-['Geist'] text-[16px] md:text-[17px] lg:text-[18px] font-[300] leading-[26px] md:leading-[28px] lg:leading-[30px] text-neutral-600 max-w-[700px] mx-auto px-4">
                 We make your WhatsApp work like a professional booking system—without changing
                 your phone number, adding new apps, or training your staff.
               </p>
             </div>
 
-            <div className="grid grid-cols-3 gap-16">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 lg:gap-16">
               <div className="opacity-0 animate-fade-in-up delay-100">
                 <h3 className="font-['Season_Mix_TRIAL'] text-[28px] leading-[32px] text-neutral-900 mb-4">
                   Captures every booking
@@ -146,19 +205,19 @@ function LandingPage() {
       </AnimatedSection>
 
       {/* See It In Action */}
-      <div className="w-full py-32 px-6 bg-neutral-50">
+      <div className="w-full py-16 md:py-24 lg:py-32 px-4 md:px-6 bg-neutral-50">
         <div className="max-w-[1280px] mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="font-['Season_Mix_TRIAL'] text-[48px] font-[400] leading-[52px] text-neutral-900 mb-6">
+          <div className="text-center mb-12 md:mb-16 lg:mb-20">
+            <h2 className="font-['Season_Mix_TRIAL'] text-[32px] md:text-[40px] lg:text-[48px] font-[400] leading-[36px] md:leading-[44px] lg:leading-[52px] text-neutral-900 mb-4 md:mb-6">
               See how it works in practice
             </h2>
-            <p className="font-['Geist'] text-[18px] font-[300] leading-[30px] text-neutral-600 max-w-[700px] mx-auto">
+            <p className="font-['Geist'] text-[16px] md:text-[17px] lg:text-[18px] font-[300] leading-[26px] md:leading-[28px] lg:leading-[30px] text-neutral-600 max-w-[700px] mx-auto px-4">
               Here's what actually happens when a customer wants to book a table.
               Everything runs through your existing WhatsApp number.
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-12 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 lg:gap-12 items-start">
             {/* Booking Conversation */}
             <div className="flex flex-col items-center opacity-0 animate-fade-in-up delay-100">
               <h3 className="font-['Season_Mix_TRIAL'] text-[24px] text-neutral-900 mb-6 text-center h-20 flex items-center">
@@ -209,19 +268,19 @@ function LandingPage() {
 
       {/* Results / Proof */}
       <AnimatedSection>
-        <div className="w-full py-32 px-6 bg-white">
+        <div className="w-full py-16 md:py-24 lg:py-32 px-4 md:px-6 bg-white">
           <div className="max-w-[1280px] mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="font-['Season_Mix_TRIAL'] text-[48px] font-[400] leading-[52px] text-neutral-900 mb-6">
+          <div className="text-center mb-12 md:mb-16 lg:mb-20">
+            <h2 className="font-['Season_Mix_TRIAL'] text-[32px] md:text-[40px] lg:text-[48px] font-[400] leading-[36px] md:leading-[44px] lg:leading-[52px] text-neutral-900 mb-4 md:mb-6">
               The results restaurants see
             </h2>
-            <p className="font-['Geist'] text-[18px] font-[300] leading-[30px] text-neutral-600 max-w-[700px] mx-auto">
+            <p className="font-['Geist'] text-[16px] md:text-[17px] lg:text-[18px] font-[300] leading-[26px] md:leading-[28px] lg:leading-[30px] text-neutral-600 max-w-[700px] mx-auto px-4">
               After switching to Caboo, most South African restaurants report these improvements
               within the first month of use.
             </p>
           </div>
 
-          <div className="grid grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
             <div className="text-center">
               <div className="font-['Season_Mix_TRIAL'] text-[52px] leading-[52px] text-neutral-700 mb-2">
                 <CountUp end={87} suffix="%" className="inline-block" />
@@ -266,13 +325,13 @@ function LandingPage() {
       </AnimatedSection>
 
       {/* Features */}
-      <div className="w-full py-32 px-6 bg-[#FCF6EF] bg-[url('https://res.cloudinary.com/subframe/image/upload/v1763074076/uploads/13740/yaaf7xczdif74hxwedcb.png')] bg-[right_-10rem_bottom_-10rem] bg-[length:1200px] bg-no-repeat">
+      <div className="w-full py-16 md:py-24 lg:py-32 px-4 md:px-6 bg-[#FCF6EF] bg-none md:bg-[url('https://res.cloudinary.com/subframe/image/upload/v1763074076/uploads/13740/yaaf7xczdif74hxwedcb.png')] md:bg-[right_-10rem_bottom_-10rem] md:bg-[length:800px] lg:bg-[length:1200px] bg-no-repeat">
         <div className="max-w-[1280px] mx-auto">
-          <div className="mb-20">
-            <h2 className="font-['Season_Mix_TRIAL'] text-[48px] font-[400] leading-[52px] text-neutral-900 mb-6">
+          <div className="mb-12 md:mb-16 lg:mb-20">
+            <h2 className="font-['Season_Mix_TRIAL'] text-[32px] md:text-[40px] lg:text-[48px] font-[400] leading-[36px] md:leading-[44px] lg:leading-[52px] text-neutral-900 mb-4 md:mb-6">
               Built for how you actually work
             </h2>
-            <p className="font-['Geist'] text-[18px] font-[300] leading-[30px] text-neutral-600 max-w-[600px]">
+            <p className="font-['Geist'] text-[16px] md:text-[17px] lg:text-[18px] font-[300] leading-[26px] md:leading-[28px] lg:leading-[30px] text-neutral-600 max-w-[600px]">
               One subscription includes everything. No add-ons, no complexity,
               no learning curve. Just intelligent WhatsApp booking management that fits
               into your restaurant's existing workflow.
@@ -396,22 +455,22 @@ function LandingPage() {
 
       {/* Pricing */}
       <AnimatedSection>
-        <div id="pricing" className="w-full py-32 px-6 bg-white">
+        <div id="pricing" className="w-full py-16 md:py-24 lg:py-32 px-4 md:px-6 bg-white">
           <div className="max-w-[1280px] mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="font-['Season_Mix_TRIAL'] text-[48px] font-[400] leading-[52px] text-neutral-900 mb-6">
+          <div className="text-center mb-12 md:mb-16 lg:mb-20">
+            <h2 className="font-['Season_Mix_TRIAL'] text-[32px] md:text-[40px] lg:text-[48px] font-[400] leading-[36px] md:leading-[44px] lg:leading-[52px] text-neutral-900 mb-4 md:mb-6">
               Simple, honest pricing
             </h2>
-            <p className="font-['Geist'] text-[18px] font-[300] leading-[30px] text-neutral-600 max-w-[600px] mx-auto">
+            <p className="font-['Geist'] text-[16px] md:text-[17px] lg:text-[18px] font-[300] leading-[26px] md:leading-[28px] lg:leading-[30px] text-neutral-600 max-w-[600px] mx-auto px-4">
               One plan with everything included. No setup fees, no contracts, no surprises.
             </p>
           </div>
 
           <div className="max-w-[700px] mx-auto text-center">
-            <div className="mb-12">
+            <div className="mb-8 md:mb-12">
               <div className="flex items-baseline justify-center gap-2 mb-4">
-                <span className="font-['Season_Mix_TRIAL'] text-[72px] leading-[72px] text-neutral-900">R599</span>
-                <span className="font-['Geist'] text-[24px] text-neutral-600">/month</span>
+                <span className="font-['Season_Mix_TRIAL'] text-[56px] md:text-[64px] lg:text-[72px] leading-[56px] md:leading-[64px] lg:leading-[72px] text-neutral-900">R599</span>
+                <span className="font-['Geist'] text-[20px] md:text-[22px] lg:text-[24px] text-neutral-600">/month</span>
               </div>
               <p className="font-['Geist'] text-[16px] text-neutral-600 mb-2">
                 Try free for 14 days
@@ -421,7 +480,7 @@ function LandingPage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-x-12 gap-y-4 mb-12 text-left max-w-[500px] mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 md:gap-x-12 gap-y-4 mb-8 md:mb-12 text-left max-w-[500px] mx-auto">
               <div className="flex items-center gap-3">
                 <FeatherCheck className="text-brand-600 flex-shrink-0" size={20} />
                 <span className="font-['Geist'] text-[16px] text-neutral-700">Unlimited bookings</span>
@@ -460,13 +519,13 @@ function LandingPage() {
 
       {/* FAQ */}
       <AnimatedSection>
-        <div id="faq" className="w-full py-32 px-6 bg-white">
+        <div id="faq" className="w-full py-16 md:py-24 lg:py-32 px-4 md:px-6 bg-white">
           <div className="max-w-[900px] mx-auto">
-          <div className="mb-20">
-            <h2 className="font-['Season_Mix_TRIAL'] text-[48px] font-[400] leading-[52px] text-neutral-900 mb-6">
+          <div className="mb-12 md:mb-16 lg:mb-20">
+            <h2 className="font-['Season_Mix_TRIAL'] text-[32px] md:text-[40px] lg:text-[48px] font-[400] leading-[36px] md:leading-[44px] lg:leading-[52px] text-neutral-900 mb-4 md:mb-6">
               Common questions
             </h2>
-            <p className="font-['Geist'] text-[18px] font-[300] leading-[30px] text-neutral-600 max-w-[600px]">
+            <p className="font-['Geist'] text-[16px] md:text-[17px] lg:text-[18px] font-[300] leading-[26px] md:leading-[28px] lg:leading-[30px] text-neutral-600 max-w-[600px]">
               Everything you need to know about using Caboo.
             </p>
           </div>
@@ -619,12 +678,12 @@ function LandingPage() {
       </AnimatedSection>
 
       {/* Final CTA */}
-      <div className="w-full py-32 px-6 bg-white border-t border-neutral-border">
+      <div className="w-full py-16 md:py-24 lg:py-32 px-4 md:px-6 bg-white border-t border-neutral-border">
         <div className="max-w-[800px] mx-auto text-center">
-          <h2 className="font-['Season_Mix_TRIAL'] text-[48px] font-[400] leading-[52px] text-neutral-900 mb-6">
+          <h2 className="font-['Season_Mix_TRIAL'] text-[32px] md:text-[40px] lg:text-[48px] font-[400] leading-[36px] md:leading-[44px] lg:leading-[52px] text-neutral-900 mb-4 md:mb-6">
             Ready to make WhatsApp work for you?
           </h2>
-          <p className="font-['Geist'] text-[20px] font-[300] leading-[32px] text-neutral-600 mb-10">
+          <p className="font-['Geist'] text-[16px] md:text-[18px] lg:text-[20px] font-[300] leading-[26px] md:leading-[30px] lg:leading-[32px] text-neutral-600 mb-8 md:mb-10 px-4">
             Join South African restaurants who've made booking management effortless.
             Try free for 14 days—no credit card required.
           </p>
@@ -642,9 +701,9 @@ function LandingPage() {
       </div>
 
       {/* Footer */}
-      <footer className="w-full py-16 px-6 bg-neutral-700">
+      <footer className="w-full py-12 md:py-16 px-4 md:px-6 bg-neutral-700">
         <div className="max-w-[1280px] mx-auto">
-          <div className="grid grid-cols-4 gap-12 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12 mb-8 md:mb-12">
             <div className="col-span-2">
               <img
                 className="h-6 flex-none object-cover mb-4 brightness-0 invert"
