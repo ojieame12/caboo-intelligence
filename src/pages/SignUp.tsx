@@ -96,7 +96,7 @@ function SignUp() {
 
             <div className="pt-4">
               <div className="flex items-center gap-4 rounded-full bg-brand-600 px-2 py-1 mb-4 btn-hover-lift">
-                <Button size="large" className="w-full">
+                <Button size="large" className="w-full" onClick={() => window.location.href = '/onboarding/connect'}>
                   Create account
                 </Button>
               </div>

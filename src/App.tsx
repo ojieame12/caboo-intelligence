@@ -7,6 +7,10 @@ import Contact from './pages/Contact'
 import Architecture from './pages/Architecture'
 import SignIn from './pages/SignIn'
 import SignUp from './pages/SignUp'
+import Connect from './pages/onboarding/Connect'
+import Processing from './pages/onboarding/Processing'
+import Settings from './pages/onboarding/Settings'
+import Success from './pages/onboarding/Success'
 import Dashboard from './pages/Dashboard'
 import Billing from './pages/Billing'
 import Integrations from './pages/Integrations'
@@ -25,6 +29,10 @@ function App() {
         <Route path="/architecture" element={<Architecture />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/onboarding/connect" element={<Connect />} />
+        <Route path="/onboarding/processing" element={<Processing />} />
+        <Route path="/onboarding/settings" element={<Settings />} />
+        <Route path="/onboarding/success" element={<Success />} />
         <Route
           path="/dashboard"
           element={

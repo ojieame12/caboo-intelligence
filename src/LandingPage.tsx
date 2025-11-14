@@ -2,7 +2,6 @@ import React from "react";
 import { Button } from "@/subframe/components/Button";
 import { Accordion } from "@/subframe/components/Accordion";
 import { FeatherCheck, FeatherArrowRight } from "@subframe/core";
-import { SignedIn, SignedOut, UserButton, SignInButton } from "@clerk/clerk-react";
 import { AnimatedSection, CountUp } from "./components/AnimatedSection";
 
 function LandingPage() {
@@ -29,31 +28,21 @@ function LandingPage() {
             <a href="#faq" className="font-['Inter'] text-[14px] font-[400] text-neutral-600 hover:text-neutral-900 transition-colors link-underline">
               FAQ
             </a>
-            <SignedOut>
-              <SignInButton mode="modal" afterSignInUrl="/dashboard">
-                <button className="font-['Inter'] text-[14px] font-[500] text-neutral-900 hover:text-brand-600 transition-colors">
-                  Sign in
-                </button>
-              </SignInButton>
-            </SignedOut>
-            <SignedIn>
-              <UserButton appearance={{ elements: { avatarBox: "w-9 h-9" } }} afterSignOutUrl="/" />
-            </SignedIn>
+            <a
+              href="/signin"
+              className="font-['Inter'] text-[14px] font-[500] text-neutral-900 hover:text-brand-600 transition-colors"
+            >
+              Sign in
+            </a>
           </div>
 
           <div className="flex items-center gap-3">
-            <SignedOut>
-              <SignInButton mode="modal" afterSignInUrl="/dashboard">
-                <button className="font-['Inter'] text-[14px] font-[500] text-neutral-900 hover:text-brand-600 transition-colors md:hidden">
-                  Sign in
-                </button>
-              </SignInButton>
-            </SignedOut>
-            <SignedIn>
-              <div className="md:hidden">
-                <UserButton appearance={{ elements: { avatarBox: "w-9 h-9" } }} afterSignOutUrl="/" />
-              </div>
-            </SignedIn>
+            <a
+              href="/signin"
+              className="font-['Inter'] text-[14px] font-[500] text-neutral-900 hover:text-brand-600 transition-colors md:hidden"
+            >
+              Sign in
+            </a>
             <a href="/privacy" className="font-['Inter'] text-[14px] font-[400] text-neutral-600 hover:text-neutral-900 transition-colors">
               Privacy
             </a>
