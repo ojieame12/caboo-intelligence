@@ -3,6 +3,7 @@ import { Button } from "@/subframe/components/Button";
 import { Accordion } from "@/subframe/components/Accordion";
 import { FeatherCheck, FeatherArrowRight } from "@subframe/core";
 import { SignedIn, SignedOut, UserButton, SignInButton } from "@clerk/clerk-react";
+import { AnimatedSection, CountUp } from "./components/AnimatedSection";
 
 function LandingPage() {
   return (
@@ -19,13 +20,13 @@ function LandingPage() {
           </div>
 
           <div className="hidden md:flex items-center gap-6">
-            <a href="#what-is-caboo" className="font-['Inter'] text-[14px] font-[400] text-neutral-600 hover:text-neutral-900 transition-colors">
+            <a href="#what-is-caboo" className="font-['Inter'] text-[14px] font-[400] text-neutral-600 hover:text-neutral-900 transition-colors link-underline">
               How It Works
             </a>
-            <a href="#pricing" className="font-['Inter'] text-[14px] font-[400] text-neutral-600 hover:text-neutral-900 transition-colors">
+            <a href="#pricing" className="font-['Inter'] text-[14px] font-[400] text-neutral-600 hover:text-neutral-900 transition-colors link-underline">
               Pricing
             </a>
-            <a href="#faq" className="font-['Inter'] text-[14px] font-[400] text-neutral-600 hover:text-neutral-900 transition-colors">
+            <a href="#faq" className="font-['Inter'] text-[14px] font-[400] text-neutral-600 hover:text-neutral-900 transition-colors link-underline">
               FAQ
             </a>
             <SignedOut>
@@ -69,18 +70,18 @@ function LandingPage() {
       <div className="w-full px-6 py-6">
         <div className="flex h-144 w-full flex-none flex-col items-center justify-center gap-8 rounded-2xl px-6 py-2 bg-[#FCF6EF] bg-[url('https://res.cloudinary.com/subframe/image/upload/v1763068410/uploads/13740/bhhmezdkrjimc9edtafq.png')] bg-[right_9rem_top_-9rem] bg-[length:600px] bg-no-repeat">
           <div className="flex w-full max-w-[1280px] flex-col items-start gap-6">
-            <h1 className="whitespace-pre-wrap font-['Season_Mix_TRIAL'] text-[56px] font-[400] leading-[60px] text-neutral-900">
+            <h1 className="whitespace-pre-wrap font-['Season_Mix_TRIAL'] text-[56px] font-[400] leading-[60px] text-neutral-900 animate-fade-in">
               {"Your "}
               <span className="text-[#128C7E]">WhatsApp</span>
               {".\nSmarter bookings.\nHappier customers."}
             </h1>
-            <p className="max-w-[600px] font-['Geist'] text-[20px] font-[300] leading-[32px] tracking-wide text-neutral-600">
+            <p className="max-w-[600px] font-['Geist'] text-[20px] font-[300] leading-[32px] tracking-wide text-neutral-600 animate-fade-in delay-200">
               Automated WhatsApp booking assistant for South African restaurants.
               Never miss a request. Cut no-shows by 91%. Keep your existing number.
             </p>
           </div>
-          <div className="flex w-full max-w-[1280px] flex-wrap items-center gap-4">
-            <div className="flex items-center gap-4 rounded-full bg-brand-600 px-3 py-2">
+          <div className="flex w-full max-w-[1280px] flex-wrap items-center gap-4 animate-fade-in delay-400">
+            <div className="flex items-center gap-4 rounded-full bg-brand-600 px-3 py-2 btn-hover-lift">
               <Button size="large" onClick={() => window.location.href = '#pricing'}>
                 Start free 14-day trial
               </Button>
@@ -93,51 +94,53 @@ function LandingPage() {
       </div>
 
       {/* What Caboo Does */}
-      <div id="what-is-caboo" className="w-full py-32 px-6 bg-white">
-        <div className="max-w-[1280px] mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="font-['Season_Mix_TRIAL'] text-[48px] font-[400] leading-[52px] text-neutral-900 mb-6">
-              What Caboo does for your restaurant
-            </h2>
-            <p className="font-['Geist'] text-[18px] font-[300] leading-[30px] text-neutral-600 max-w-[700px] mx-auto">
-              We make your WhatsApp work like a professional booking system—without changing
-              your phone number, adding new apps, or training your staff.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-3 gap-16">
-            <div>
-              <h3 className="font-['Season_Mix_TRIAL'] text-[28px] leading-[32px] text-neutral-900 mb-4">
-                Captures every booking
-              </h3>
-              <p className="font-['Geist'] text-[16px] font-[300] leading-[26px] text-neutral-600">
-                Bot responds in seconds. Customers get instant replies.
-                You get organized booking details.
+      <AnimatedSection>
+        <div id="what-is-caboo" className="w-full py-32 px-6 bg-white">
+          <div className="max-w-[1280px] mx-auto">
+            <div className="text-center mb-20">
+              <h2 className="font-['Season_Mix_TRIAL'] text-[48px] font-[400] leading-[52px] text-neutral-900 mb-6">
+                What Caboo does for your restaurant
+              </h2>
+              <p className="font-['Geist'] text-[18px] font-[300] leading-[30px] text-neutral-600 max-w-[700px] mx-auto">
+                We make your WhatsApp work like a professional booking system—without changing
+                your phone number, adding new apps, or training your staff.
               </p>
             </div>
 
-            <div>
-              <h3 className="font-['Season_Mix_TRIAL'] text-[28px] leading-[32px] text-neutral-900 mb-4">
-                One-tap confirmations
-              </h3>
-              <p className="font-['Geist'] text-[16px] font-[300] leading-[26px] text-neutral-600">
-                WhatsApp notification with booking details.
-                Tap Confirm or Decline. Customer gets instant confirmation.
-              </p>
-            </div>
+            <div className="grid grid-cols-3 gap-16">
+              <div className="opacity-0 animate-fade-in-up delay-100">
+                <h3 className="font-['Season_Mix_TRIAL'] text-[28px] leading-[32px] text-neutral-900 mb-4">
+                  Captures every booking
+                </h3>
+                <p className="font-['Geist'] text-[16px] font-[300] leading-[26px] text-neutral-600">
+                  Bot responds in seconds. Customers get instant replies.
+                  You get organized booking details.
+                </p>
+              </div>
 
-            <div>
-              <h3 className="font-['Season_Mix_TRIAL'] text-[28px] leading-[32px] text-neutral-900 mb-4">
-                Automatic reminders
-              </h3>
-              <p className="font-['Geist'] text-[16px] font-[300] leading-[26px] text-neutral-600">
-                Customers get reminded before their booking.
-                Easy to confirm or cancel. No-shows drop to almost zero.
-              </p>
+              <div className="opacity-0 animate-fade-in-up delay-200">
+                <h3 className="font-['Season_Mix_TRIAL'] text-[28px] leading-[32px] text-neutral-900 mb-4">
+                  One-tap confirmations
+                </h3>
+                <p className="font-['Geist'] text-[16px] font-[300] leading-[26px] text-neutral-600">
+                  WhatsApp notification with booking details.
+                  Tap Confirm or Decline. Customer gets instant confirmation.
+                </p>
+              </div>
+
+              <div className="opacity-0 animate-fade-in-up delay-300">
+                <h3 className="font-['Season_Mix_TRIAL'] text-[28px] leading-[32px] text-neutral-900 mb-4">
+                  Automatic reminders
+                </h3>
+                <p className="font-['Geist'] text-[16px] font-[300] leading-[26px] text-neutral-600">
+                  Customers get reminded before their booking.
+                  Easy to confirm or cancel. No-shows drop to almost zero.
+                </p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </AnimatedSection>
 
       {/* See It In Action */}
       <div className="w-full py-32 px-6 bg-neutral-50">
@@ -154,14 +157,14 @@ function LandingPage() {
 
           <div className="grid grid-cols-3 gap-12 items-start">
             {/* Booking Conversation */}
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center opacity-0 animate-fade-in-up delay-100">
               <h3 className="font-['Season_Mix_TRIAL'] text-[24px] text-neutral-900 mb-6 text-center h-20 flex items-center">
                 Customer books a table
               </h3>
               <img
                 src="/mockup-conversation.png"
                 alt="WhatsApp booking conversation"
-                className="w-full h-auto object-contain"
+                className="w-full h-auto object-contain transition-transform duration-300 hover:scale-[1.02]"
               />
               <p className="font-['Geist'] text-[14px] font-[300] text-neutral-500 mt-6 text-center max-w-[280px]">
                 Bot asks for party size and time naturally. Quick reply buttons make it easy.
@@ -169,14 +172,14 @@ function LandingPage() {
             </div>
 
             {/* Confirmation Flow */}
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center opacity-0 animate-fade-in-up delay-200">
               <h3 className="font-['Season_Mix_TRIAL'] text-[24px] text-neutral-900 mb-6 text-center h-20 flex items-center">
                 You confirm with one tap
               </h3>
               <img
                 src="/mockup-notification.png"
                 alt="Restaurant notification to confirm"
-                className="w-full h-auto object-contain"
+                className="w-full h-auto object-contain transition-transform duration-300 hover:scale-[1.02]"
               />
               <p className="font-['Geist'] text-[14px] font-[300] text-neutral-500 mt-6 text-center max-w-[280px]">
                 Clean notification in your WhatsApp. Tap YES to confirm or Decline to reject.
@@ -184,14 +187,14 @@ function LandingPage() {
             </div>
 
             {/* Reminder */}
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center opacity-0 animate-fade-in-up delay-300">
               <h3 className="font-['Season_Mix_TRIAL'] text-[24px] text-neutral-900 mb-6 text-center h-20 flex items-center">
                 Automatic reminders sent
               </h3>
               <img
                 src="/mockup-reminder.png"
                 alt="Automatic booking reminder"
-                className="w-full h-auto object-contain"
+                className="w-full h-auto object-contain transition-transform duration-300 hover:scale-[1.02]"
               />
               <p className="font-['Geist'] text-[14px] font-[300] text-neutral-500 mt-6 text-center max-w-[280px]">
                 Customer gets friendly reminder. Can confirm, reschedule, or cancel easily.
@@ -202,8 +205,9 @@ function LandingPage() {
       </div>
 
       {/* Results / Proof */}
-      <div className="w-full py-32 px-6 bg-white">
-        <div className="max-w-[1280px] mx-auto">
+      <AnimatedSection>
+        <div className="w-full py-32 px-6 bg-white">
+          <div className="max-w-[1280px] mx-auto">
           <div className="text-center mb-20">
             <h2 className="font-['Season_Mix_TRIAL'] text-[48px] font-[400] leading-[52px] text-neutral-900 mb-6">
               The results restaurants see
@@ -216,25 +220,33 @@ function LandingPage() {
 
           <div className="grid grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="font-['Season_Mix_TRIAL'] text-[52px] leading-[52px] text-neutral-700 mb-2">87%</div>
+              <div className="font-['Season_Mix_TRIAL'] text-[52px] leading-[52px] text-neutral-700 mb-2">
+                <CountUp end={87} suffix="%" className="inline-block" />
+              </div>
               <p className="font-['Geist'] text-[14px] leading-[20px] text-neutral-600">
                 Bookings captured that would've been missed
               </p>
             </div>
             <div className="text-center">
-              <div className="font-['Season_Mix_TRIAL'] text-[52px] leading-[52px] text-neutral-700 mb-2">91%</div>
+              <div className="font-['Season_Mix_TRIAL'] text-[52px] leading-[52px] text-neutral-700 mb-2">
+                <CountUp end={91} suffix="%" className="inline-block" />
+              </div>
               <p className="font-['Geist'] text-[14px] leading-[20px] text-neutral-600">
                 Reduction in no-shows with reminders
               </p>
             </div>
             <div className="text-center">
-              <div className="font-['Season_Mix_TRIAL'] text-[52px] leading-[52px] text-neutral-700 mb-2">R22K</div>
+              <div className="font-['Season_Mix_TRIAL'] text-[52px] leading-[52px] text-neutral-700 mb-2">
+                R<CountUp end={22} suffix="K" className="inline-block" />
+              </div>
               <p className="font-['Geist'] text-[14px] leading-[20px] text-neutral-600">
                 Average monthly revenue recovered
               </p>
             </div>
             <div className="text-center">
-              <div className="font-['Season_Mix_TRIAL'] text-[52px] leading-[52px] text-neutral-700 mb-2">2.5h</div>
+              <div className="font-['Season_Mix_TRIAL'] text-[52px] leading-[52px] text-neutral-700 mb-2">
+                <CountUp end={2.5} suffix="h" className="inline-block" duration={1500} />
+              </div>
               <p className="font-['Geist'] text-[14px] leading-[20px] text-neutral-600">
                 Daily staff time freed up
               </p>
@@ -247,7 +259,7 @@ function LandingPage() {
             </p>
           </div>
         </div>
-      </div>
+      </AnimatedSection>
 
       {/* Features */}
       <div className="w-full py-32 px-6 bg-[#FCF6EF] bg-[url('https://res.cloudinary.com/subframe/image/upload/v1763074076/uploads/13740/yaaf7xczdif74hxwedcb.png')] bg-[right_-10rem_bottom_-10rem] bg-[length:800px] bg-no-repeat">
@@ -377,8 +389,9 @@ function LandingPage() {
       </div>
 
       {/* Pricing */}
-      <div id="pricing" className="w-full py-32 px-6 bg-white">
-        <div className="max-w-[1280px] mx-auto">
+      <AnimatedSection>
+        <div id="pricing" className="w-full py-32 px-6 bg-white">
+          <div className="max-w-[1280px] mx-auto">
           <div className="text-center mb-20">
             <h2 className="font-['Season_Mix_TRIAL'] text-[48px] font-[400] leading-[52px] text-neutral-900 mb-6">
               Simple, honest pricing
@@ -429,18 +442,19 @@ function LandingPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-4 rounded-full bg-brand-600 px-3 py-2 max-w-[300px] mx-auto mb-4">
+            <div className="flex items-center gap-4 rounded-full bg-brand-600 px-3 py-2 max-w-[300px] mx-auto mb-4 btn-hover-lift">
               <Button size="large">
                 Start your free trial
               </Button>
             </div>
           </div>
         </div>
-      </div>
+      </AnimatedSection>
 
       {/* FAQ */}
-      <div id="faq" className="w-full py-32 px-6 bg-white">
-        <div className="max-w-[900px] mx-auto">
+      <AnimatedSection>
+        <div id="faq" className="w-full py-32 px-6 bg-white">
+          <div className="max-w-[900px] mx-auto">
           <div className="mb-20">
             <h2 className="font-['Season_Mix_TRIAL'] text-[48px] font-[400] leading-[52px] text-neutral-900 mb-6">
               Common questions
@@ -594,7 +608,7 @@ function LandingPage() {
             </Accordion>
           </div>
         </div>
-      </div>
+      </AnimatedSection>
 
       {/* Final CTA */}
       <div className="w-full py-32 px-6 bg-white border-t border-neutral-border">
@@ -607,7 +621,7 @@ function LandingPage() {
             Try free for 14 days—no credit card required.
           </p>
           <div className="flex flex-col items-center gap-4">
-            <div className="flex items-center gap-4 rounded-full bg-brand-600 px-3 py-2">
+            <div className="flex items-center gap-4 rounded-full bg-brand-600 px-3 py-2 btn-hover-lift">
               <Button size="large">
                 Start your free trial
               </Button>
