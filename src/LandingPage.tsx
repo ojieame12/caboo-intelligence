@@ -8,43 +8,37 @@ function LandingPage() {
   return (
     <div className="flex h-full w-full flex-col items-center bg-default-background">
       {/* Navbar */}
-      <div className="w-full border-b border-neutral-border bg-white sticky top-0 z-50">
-        <div className="flex w-full max-w-[1280px] mx-auto flex-wrap items-center justify-between gap-4 px-6 py-4">
-          <div className="flex h-12 flex-col items-start justify-center gap-2">
+      <div className="w-full border-b border-neutral-border bg-white sticky top-0 z-50 backdrop-blur-sm bg-white/90">
+        <div className="flex w-full max-w-[1280px] mx-auto items-center justify-between px-6 py-4">
+          {/* Logo */}
+          <a href="/" className="flex h-12 flex-col items-start justify-center gap-2">
             <img
               className="h-6 flex-none object-cover"
               src="https://res.cloudinary.com/subframe/image/upload/v1763066614/uploads/13740/a9fxbxmydd83ltwoisxc.svg"
               alt="Caboo Logo"
             />
-          </div>
+          </a>
 
-          <div className="hidden md:flex items-center gap-6">
-            <a href="#what-is-caboo" className="font-['Inter'] text-[14px] font-[400] text-neutral-600 hover:text-neutral-900 transition-colors link-underline">
+          {/* Center Nav - Desktop Only */}
+          <nav className="hidden md:flex items-center gap-8">
+            <a href="#what-is-caboo" className="font-['Inter'] text-[14px] font-[400] text-neutral-600 hover:text-neutral-900 transition-colors">
               How It Works
             </a>
-            <a href="#pricing" className="font-['Inter'] text-[14px] font-[400] text-neutral-600 hover:text-neutral-900 transition-colors link-underline">
+            <a href="#pricing" className="font-['Inter'] text-[14px] font-[400] text-neutral-600 hover:text-neutral-900 transition-colors">
               Pricing
             </a>
-            <a href="#faq" className="font-['Inter'] text-[14px] font-[400] text-neutral-600 hover:text-neutral-900 transition-colors link-underline">
+            <a href="#faq" className="font-['Inter'] text-[14px] font-[400] text-neutral-600 hover:text-neutral-900 transition-colors">
               FAQ
             </a>
-            <a
-              href="/signin"
-              className="font-['Inter'] text-[14px] font-[500] text-neutral-900 hover:text-brand-600 transition-colors"
-            >
-              Sign in
-            </a>
-          </div>
+          </nav>
 
-          <div className="flex items-center gap-3">
+          {/* Right Actions */}
+          <div className="flex items-center gap-4">
             <a
               href="/signin"
-              className="font-['Inter'] text-[14px] font-[500] text-neutral-900 hover:text-brand-600 transition-colors md:hidden"
+              className="font-['Inter'] text-[14px] font-[400] text-neutral-600 hover:text-neutral-900 transition-colors"
             >
               Sign in
-            </a>
-            <a href="/privacy" className="font-['Inter'] text-[14px] font-[400] text-neutral-600 hover:text-neutral-900 transition-colors">
-              Privacy
             </a>
             <div className="flex items-center gap-2 rounded-full bg-brand-600 px-2 py-1 btn-hover-lift">
               <Button onClick={() => window.location.href = '/signup'}>
