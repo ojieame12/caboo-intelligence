@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Button } from "@/subframe/components/Button";
 import { AnimatedInput } from "@/components/AnimatedInput";
 import { FeatherCheck, FeatherX, FeatherCalendar, FeatherUser, FeatherPhone } from "@subframe/core";
 import { useAuthContext } from "@/context/AuthContext";
-import { api } from "@/lib/api";
+import { useBookings } from "@/hooks/useBookings";
 
 type Booking = {
   id: string;
@@ -18,45 +18,11 @@ type Booking = {
 };
 
 function Bookings() {
-  const { user, logout } = useAuthContext();
+  const { logout } = useAuthContext();
   const [activeFilter, setActiveFilter] = useState("today");
   const [search, setSearch] = useState("");
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let isMounted = true;
-    const delay = setTimeout(() => {
-      async function fetchBookings() {
-        if (!user?.token) return;
-        setLoading(true);
-        setError(null);
-        try {
-          const params = new URLSearchParams({ filter: activeFilter });
-          if (search) params.append("search", search);
-          const data = await api.get<{ bookings: Booking[] }>(`/api/bookings?${params.toString()}`, user.token);
-          if (isMounted) {
-            setBookings(data.bookings);
-          }
-        } catch (err) {
-          if (isMounted) {
-            setError(err instanceof Error ? err.message : "Unable to load bookings.");
-          }
-        } finally {
-          if (isMounted) {
-            setLoading(false);
-          }
-        }
-      }
-      fetchBookings();
-    }, 400);
-    return () => {
-      isMounted = false;
-      clearTimeout(delay);
-    };
-  }, [user?.token, activeFilter, search]);
+  const { bookings, loading, error } = useBookings(activeFilter, search);
 
   const formatterDate = useMemo(
     () =>

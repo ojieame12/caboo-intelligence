@@ -6,7 +6,7 @@ import { FeatherCheck, FeatherAlertCircle, FeatherDownload, FeatherTrash2 } from
 import { useAuthContext } from "@/context/AuthContext";
 
 function Settings() {
-  const { logout } = useAuthContext();
+  const { user, logout } = useAuthContext();
 
   // Mock state
   const [connectedNumber, setConnectedNumber] = useState("+27 82 123 4567");

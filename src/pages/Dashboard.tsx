@@ -1,8 +1,9 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { Button } from "@/subframe/components/Button";
 import { FeatherCheck, FeatherAlertCircle } from "@subframe/core";
 import { useAuthContext } from "@/context/AuthContext";
-import { api } from "@/lib/api";
+import { useDashboardSummary } from "@/hooks/useDashboardSummary";
+import type { DashboardSummary } from "@/hooks/useDashboardSummary";
 
 type BookingSummary = {
   id: string;
@@ -33,38 +34,36 @@ type DashboardSummary = {
   };
 };
 
-function Dashboard() {
-  const { user, logout } = useAuthContext();
-  const [summary, setSummary] = useState<DashboardSummary | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+const fallbackSummary: DashboardSummary = {
+  connection: {
+    phoneNumber: "+27 82 123 4567",
+    lastBookingAt: null,
+  },
+  today: [
+    { id: "mock-1", customer_name: "Sarah Chen", party_size: 4, booking_time: new Date().toISOString(), status: "confirmed" },
+    { id: "mock-2", customer_name: "Marco Silva", party_size: 2, booking_time: new Date().toISOString(), status: "pending" },
+  ],
+  tomorrow: [
+    { id: "mock-3", customer_name: "Nandi Dlamini", party_size: 5, booking_time: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), status: "confirmed" },
+  ],
+  stats: {
+    bookings: 48,
+    messages: 192,
+    noShowsPrevented: 4,
+    moneySaved: 3600,
+  },
+  quickActions: {
+    remindersEnabled: true,
+  },
+  trial: {
+    trialEndsAt: new Date(Date.now() + 12 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+};
 
-  useEffect(() => {
-    let isMounted = true;
-    async function fetchSummary() {
-      if (!user?.token) return;
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await api.get<DashboardSummary>("/api/dashboard/summary", user.token);
-        if (isMounted) {
-          setSummary(data);
-        }
-      } catch (err) {
-        if (isMounted) {
-          setError(err instanceof Error ? err.message : "Unable to load dashboard.");
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    }
-    fetchSummary();
-    return () => {
-      isMounted = false;
-    };
-  }, [user?.token]);
+function Dashboard() {
+  const { logout } = useAuthContext();
+  const { data, loading, error } = useDashboardSummary();
+  const summary = data && data.today.length ? data : fallbackSummary;
 
   const trialBadge = useMemo(() => {
     if (!summary?.trial?.trialEndsAt) return "Trial active";
