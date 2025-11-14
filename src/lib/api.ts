@@ -20,7 +20,6 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
     method: options.method ?? 'GET',
     headers,
     body: options.body ? JSON.stringify(options.body) : undefined,
-    credentials: 'include',
   })
 
   const data = await response.json().catch(() => ({}))
@@ -33,6 +32,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
 }
 
 export const api = {
-  post: <T>(path: string, body: unknown) => request<T>(path, { method: 'POST', body }),
+  post: <T>(path: string, body: unknown, token?: string) => request<T>(path, { method: 'POST', body, token }),
   get: <T>(path: string, token?: string) => request<T>(path, { method: 'GET', token }),
+  put: <T>(path: string, body: unknown, token?: string) => request<T>(path, { method: 'PUT', body, token }),
 }

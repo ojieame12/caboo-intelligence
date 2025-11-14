@@ -60,7 +60,7 @@ function SignUp() {
         restaurant: response.restaurant,
       });
 
-      navigate("/dashboard");
+      navigate("/beta-waitlist");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to create account right now.");
     } finally {

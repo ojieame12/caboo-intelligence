@@ -1,28 +1,135 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "@/subframe/components/Button";
 import { FeatherCheck, FeatherAlertCircle } from "@subframe/core";
 import { useAuthContext } from "@/context/AuthContext";
+import { api } from "@/lib/api";
+
+type BookingSummary = {
+  id: string;
+  customer_name: string;
+  party_size: number;
+  booking_time: string;
+  status: string;
+};
+
+type DashboardSummary = {
+  connection: {
+    phoneNumber?: string;
+    lastBookingAt?: string | null;
+  };
+  today: BookingSummary[];
+  tomorrow: BookingSummary[];
+  stats: {
+    bookings: number;
+    messages: number;
+    noShowsPrevented: number;
+    moneySaved: number;
+  };
+  quickActions: {
+    remindersEnabled: boolean;
+  };
+  trial: {
+    trialEndsAt?: string | null;
+  };
+};
 
 function Dashboard() {
   const { user, logout } = useAuthContext();
+  const [summary, setSummary] = useState<DashboardSummary | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Mock data - replace with real data from API
-  const mockBookings = {
-    today: [
-      { time: "19:00", name: "Sarah Chen", people: 4, status: "confirmed" },
-      { time: "20:30", name: "Marco Silva", people: 2, status: "pending" },
-    ],
-    tomorrow: [
-      { time: "18:30", name: "Nandi Dlamini", people: 5, status: "confirmed" },
-    ],
-  };
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchSummary() {
+      if (!user?.token) return;
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await api.get<DashboardSummary>("/api/dashboard/summary", user.token);
+        if (isMounted) {
+          setSummary(data);
+        }
+      } catch (err) {
+        if (isMounted) {
+          setError(err instanceof Error ? err.message : "Unable to load dashboard.");
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    }
+    fetchSummary();
+    return () => {
+      isMounted = false;
+    };
+  }, [user?.token]);
 
-  const weekStats = {
-    bookings: 48,
-    messages: 192,
-    noShowsPrevented: 4,
-    moneySaved: 3600,
-  };
+  const trialBadge = useMemo(() => {
+    if (!summary?.trial?.trialEndsAt) return "Trial active";
+    const trialEndDate = new Date(summary.trial.trialEndsAt);
+    const now = new Date();
+    const diff = Math.ceil((trialEndDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    return diff > 0 ? `Trial: ${diff} day${diff === 1 ? "" : "s"} left` : "Trial ended";
+  }, [summary]);
+
+  const formatterTime = useMemo(
+    () =>
+      new Intl.DateTimeFormat("en-ZA", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      }),
+    [],
+  );
+
+  const formatterDate = useMemo(
+    () =>
+      new Intl.DateTimeFormat("en-ZA", {
+        month: "short",
+        day: "numeric",
+      }),
+    [],
+  );
+
+  const formatTime = (iso: string) => formatterTime.format(new Date(iso));
+  const formatDate = (iso: string) => formatterDate.format(new Date(iso));
+
+  const connectionLabel = summary?.connection.phoneNumber
+    ? `${summary.connection.phoneNumber}${
+        summary.connection.lastBookingAt
+          ? ` • Last booking ${formatDate(summary.connection.lastBookingAt)}`
+          : ""
+      }`
+    : "No number connected yet";
+
+  const todayBookings = summary?.today ?? [];
+  const tomorrowBookings = summary?.tomorrow ?? [];
+  const stats = summary?.stats;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#FCF6EF]">
+        <p className="font-['Geist'] text-neutral-500 text-[15px]">Loading your dashboard...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#FCF6EF] px-6 text-center">
+        <div className="max-w-md">
+          <p className="font-['Geist'] text-[15px] text-error-600 mb-4">{error}</p>
+          <Button onClick={() => window.location.reload()}>Retry</Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!summary) {
+    return null;
+  }
 
   return (
     <div className="flex h-full min-h-screen w-full flex-col bg-default-background">
@@ -54,7 +161,7 @@ function Dashboard() {
             <div className="hidden md:flex items-center gap-2 bg-success-50 border border-success-200 rounded-full px-4 py-2">
               <div className="w-2 h-2 rounded-full bg-success-600 animate-pulse"></div>
               <span className="font-['Geist'] text-[13px] font-medium text-success-700">
-                Trial: 12 days left
+                {trialBadge}
               </span>
             </div>
             <button
@@ -82,7 +189,7 @@ function Dashboard() {
                   WhatsApp Connected
                 </p>
                 <p className="font-['Geist'] text-[13px] font-[300] text-neutral-600">
-                  +27 82 123 4567 • Last booking: 2 hours ago
+                  {connectionLabel}
                 </p>
               </div>
             </div>
@@ -110,23 +217,23 @@ function Dashboard() {
                   Today
                 </h2>
                 <span className="font-['Geist'] text-[13px] font-medium text-neutral-500">
-                  {mockBookings.today.length} bookings
+                  {todayBookings.length} booking{todayBookings.length === 1 ? "" : "s"}
                 </span>
               </div>
 
               <div className="space-y-4">
-                {mockBookings.today.map((booking, i) => (
-                  <div key={i} className="flex items-center justify-between py-3 border-b border-neutral-100 last:border-0">
+                {todayBookings.map((booking) => (
+                  <div key={booking.id} className="flex items-center justify-between py-3 border-b border-neutral-100 last:border-0">
                     <div className="flex items-center gap-4">
                       <div className="font-['Geist'] text-[16px] font-medium text-neutral-900 min-w-[60px]">
-                        {booking.time}
+                        {formatTime(booking.booking_time)}
                       </div>
                       <div>
                         <p className="font-['Geist'] text-[15px] font-medium text-neutral-900">
-                          {booking.name}
+                          {booking.customer_name}
                         </p>
                         <p className="font-['Geist'] text-[13px] font-[300] text-neutral-600">
-                          {booking.people} {booking.people === 1 ? 'person' : 'people'}
+                          {booking.party_size} {booking.party_size === 1 ? 'person' : 'people'}
                         </p>
                       </div>
                     </div>
@@ -160,23 +267,23 @@ function Dashboard() {
                   Tomorrow
                 </h2>
                 <span className="font-['Geist'] text-[13px] font-medium text-neutral-500">
-                  {mockBookings.tomorrow.length} booking
+                  {tomorrowBookings.length} booking{tomorrowBookings.length === 1 ? "" : "s"}
                 </span>
               </div>
 
               <div className="space-y-4">
-                {mockBookings.tomorrow.map((booking, i) => (
-                  <div key={i} className="flex items-center justify-between py-3 border-b border-neutral-100 last:border-0">
+                {tomorrowBookings.map((booking) => (
+                  <div key={booking.id} className="flex items-center justify-between py-3 border-b border-neutral-100 last:border-0">
                     <div className="flex items-center gap-4">
                       <div className="font-['Geist'] text-[16px] font-medium text-neutral-900 min-w-[60px]">
-                        {booking.time}
+                        {formatTime(booking.booking_time)}
                       </div>
                       <div>
                         <p className="font-['Geist'] text-[15px] font-medium text-neutral-900">
-                          {booking.name}
+                          {booking.customer_name}
                         </p>
                         <p className="font-['Geist'] text-[13px] font-[300] text-neutral-600">
-                          {booking.people} people
+                          {booking.party_size} {booking.party_size === 1 ? 'person' : 'people'}
                         </p>
                       </div>
                     </div>
@@ -210,7 +317,7 @@ function Dashboard() {
                   Bookings handled
                 </p>
                 <p className="font-['Season_Mix_TRIAL'] text-[36px] md:text-[40px] leading-[40px] text-neutral-900">
-                  {weekStats.bookings}
+                  {stats?.bookings ?? 0}
                 </p>
               </div>
 
@@ -219,7 +326,7 @@ function Dashboard() {
                   WhatsApp messages
                 </p>
                 <p className="font-['Season_Mix_TRIAL'] text-[36px] md:text-[40px] leading-[40px] text-neutral-900">
-                  {weekStats.messages}
+                  {stats?.messages ?? 0}
                 </p>
               </div>
 
@@ -228,7 +335,7 @@ function Dashboard() {
                   No-shows prevented
                 </p>
                 <p className="font-['Season_Mix_TRIAL'] text-[36px] md:text-[40px] leading-[40px] text-neutral-900">
-                  {weekStats.noShowsPrevented}
+                  {stats?.noShowsPrevented ?? 0}
                 </p>
               </div>
 
@@ -237,7 +344,7 @@ function Dashboard() {
                   Money saved
                 </p>
                 <p className="font-['Season_Mix_TRIAL'] text-[36px] md:text-[40px] leading-[40px] text-success-600">
-                  R{weekStats.moneySaved.toLocaleString()}
+                  R{(stats?.moneySaved ?? 0).toLocaleString()}
                 </p>
               </div>
             </div>
@@ -260,12 +367,11 @@ function Dashboard() {
                       Reminders
                     </p>
                     <p className="font-['Geist'] text-[13px] font-[300] text-neutral-600 mb-3">
-                      Currently ON - 3h before
+                      {summary.quickActions.remindersEnabled ? "Currently ON" : "Currently OFF"}
                     </p>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input type="checkbox" defaultChecked className="accent-brand-600" />
-                      <span className="font-['Geist'] text-[13px] text-neutral-700">Enabled</span>
-                    </label>
+                    <p className="font-['Geist'] text-[12px] text-neutral-500">
+                      Manage reminder timing in Settings
+                    </p>
                   </div>
                 </div>
               </div>

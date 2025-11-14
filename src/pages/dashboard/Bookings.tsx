@@ -1,68 +1,111 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "@/subframe/components/Button";
 import { AnimatedInput } from "@/components/AnimatedInput";
 import { FeatherCheck, FeatherX, FeatherCalendar, FeatherUser, FeatherPhone } from "@subframe/core";
 import { useAuthContext } from "@/context/AuthContext";
+import { api } from "@/lib/api";
+
+type Booking = {
+  id: string;
+  customer_name: string;
+  customer_phone: string | null;
+  party_size: number;
+  status: string;
+  source: string;
+  notes: string | null;
+  booking_time: string;
+  created_at: string;
+};
 
 function Bookings() {
-  const { logout } = useAuthContext();
+  const { user, logout } = useAuthContext();
   const [activeFilter, setActiveFilter] = useState("today");
   const [search, setSearch] = useState("");
-  const [selectedBooking, setSelectedBooking] = useState<any>(null);
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Mock bookings data
-  const mockBookings = [
-    {
-      id: 1,
-      date: "Nov 14",
-      time: "19:00",
-      name: "Sarah Chen",
-      phone: "+27 82 123 4567",
-      people: 4,
-      status: "confirmed",
-      source: "whatsapp",
-      notes: "Birthday dinner, vegetarian option needed",
-      created: "2 hours ago"
-    },
-    {
-      id: 2,
-      date: "Nov 14",
-      time: "20:30",
-      name: "Marco Silva",
-      phone: "+27 83 456 7890",
-      people: 2,
-      status: "pending",
-      source: "whatsapp",
-      notes: "",
-      created: "1 hour ago"
-    },
-    {
-      id: 3,
-      date: "Nov 14",
-      time: "21:00",
-      name: "Ahmed Khan",
-      phone: "+27 84 789 0123",
-      people: 6,
-      status: "confirmed",
-      source: "whatsapp",
-      notes: "Window table requested",
-      created: "3 hours ago"
-    },
-    {
-      id: 4,
-      date: "Nov 15",
-      time: "18:30",
-      name: "Nandi Dlamini",
-      phone: "+27 85 234 5678",
-      people: 5,
-      status: "confirmed",
-      source: "whatsapp",
-      notes: "",
-      created: "Yesterday"
-    },
-  ];
+  useEffect(() => {
+    let isMounted = true;
+    const delay = setTimeout(() => {
+      async function fetchBookings() {
+        if (!user?.token) return;
+        setLoading(true);
+        setError(null);
+        try {
+          const params = new URLSearchParams({ filter: activeFilter });
+          if (search) params.append("search", search);
+          const data = await api.get<{ bookings: Booking[] }>(`/api/bookings?${params.toString()}`, user.token);
+          if (isMounted) {
+            setBookings(data.bookings);
+          }
+        } catch (err) {
+          if (isMounted) {
+            setError(err instanceof Error ? err.message : "Unable to load bookings.");
+          }
+        } finally {
+          if (isMounted) {
+            setLoading(false);
+          }
+        }
+      }
+      fetchBookings();
+    }, 400);
+    return () => {
+      isMounted = false;
+      clearTimeout(delay);
+    };
+  }, [user?.token, activeFilter, search]);
 
-  const filteredBookings = mockBookings; // TODO: Apply filters
+  const formatterDate = useMemo(
+    () =>
+      new Intl.DateTimeFormat("en-ZA", {
+        month: "short",
+        day: "numeric",
+      }),
+    [],
+  );
+
+  const formatterTime = useMemo(
+    () =>
+      new Intl.DateTimeFormat("en-ZA", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      }),
+    [],
+  );
+
+  const relativeFormatter = useMemo(() => new Intl.RelativeTimeFormat("en", { numeric: "auto" }), []);
+
+  const formatRelative = (iso: string) => {
+    const now = Date.now();
+    const date = new Date(iso).getTime();
+    const diff = date - now;
+    const minutes = Math.round(diff / (1000 * 60));
+    if (Math.abs(minutes) < 60) {
+      return relativeFormatter.format(minutes, "minute");
+    }
+    const hours = Math.round(minutes / 60);
+    if (Math.abs(hours) < 24) {
+      return relativeFormatter.format(hours, "hour");
+    }
+    const days = Math.round(hours / 24);
+    return relativeFormatter.format(days, "day");
+  };
+
+  const renderLoading = (
+    <div className="bg-white rounded-2xl p-8 border border-neutral-200 text-center text-neutral-500">
+      Loading bookings...
+    </div>
+  );
+
+  const renderError = error && (
+    <div className="bg-error-50 rounded-2xl p-6 border border-error-200 text-error-700">
+      {error}
+    </div>
+  );
 
   return (
     <div className="flex h-full min-h-screen w-full flex-col bg-default-background">
@@ -155,90 +198,73 @@ function Bookings() {
             </div>
           </div>
 
-          {/* Bookings List */}
-          <div className="space-y-4 animate-fade-in-up delay-200">
-            {filteredBookings.map((booking) => (
-              <div
-                key={booking.id}
-                className="bg-white rounded-2xl p-4 md:p-6 border border-neutral-200 hover:border-brand-600 transition-all cursor-pointer"
-                onClick={() => setSelectedBooking(booking)}
-              >
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  {/* Booking Info */}
-                  <div className="flex-1">
-                    <div className="flex items-start md:items-center gap-4 mb-3">
-                      <div className="min-w-[80px]">
-                        <p className="font-['Geist'] text-[13px] font-medium text-neutral-500">{booking.date}</p>
-                        <p className="font-['Season_Mix_TRIAL'] text-[20px] leading-[24px] text-neutral-900">{booking.time}</p>
-                      </div>
+          {!loading && bookings.length > 0 && (
+            <div className="space-y-4 animate-fade-in-up delay-200">
+              {bookings.map((booking) => {
+                const bookingDate = new Date(booking.booking_time);
+                const dateLabel = formatterDate.format(bookingDate);
+                const timeLabel = formatterTime.format(bookingDate);
+                return (
+                  <div
+                    key={booking.id}
+                    className="bg-white rounded-2xl p-4 md:p-6 border border-neutral-200 hover:border-brand-600 transition-all cursor-pointer"
+                    onClick={() => setSelectedBooking(booking)}
+                  >
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                       <div className="flex-1">
-                        <p className="font-['Geist'] text-[16px] font-medium text-neutral-900">{booking.name}</p>
-                        <p className="font-['Geist'] text-[14px] font-[300] text-neutral-600">
-                          {booking.people} {booking.people === 1 ? 'person' : 'people'} • {booking.phone}
-                        </p>
-                        {booking.notes && (
-                          <p className="font-['Geist'] text-[13px] font-[300] text-neutral-500 mt-1">
-                            Note: {booking.notes}
-                          </p>
+                        <div className="flex items-start md:items-center gap-4 mb-3">
+                          <div className="min-w-[80px]">
+                            <p className="font-['Geist'] text-[13px] font-medium text-neutral-500">{dateLabel}</p>
+                            <p className="font-['Season_Mix_TRIAL'] text-[20px] leading-[24px] text-neutral-900">{timeLabel}</p>
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-['Geist'] text-[16px] font-medium text-neutral-900">{booking.customer_name}</p>
+                            <p className="font-['Geist'] text-[14px] font-[300] text-neutral-600">
+                              {booking.party_size} {booking.party_size === 1 ? 'person' : 'people'} • {booking.customer_phone || 'No phone'}
+                            </p>
+                            {booking.notes && (
+                              <p className="font-['Geist'] text-[13px] font-[300] text-neutral-500 mt-1">
+                                Note: {booking.notes}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="inline-flex items-center gap-1 bg-neutral-100 text-neutral-600 px-2 py-1 rounded-full">
+                            <span className="text-[12px]">💬</span>
+                            <span className="font-['Geist'] text-[11px] font-medium">{booking.source}</span>
+                          </span>
+                          <span className="font-['Geist'] text-[12px] text-neutral-400">
+                            {formatRelative(booking.created_at)}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end gap-3">
+                        {booking.status === 'confirmed' ? (
+                          <span className="inline-flex items-center gap-1.5 bg-success-50 text-success-700 px-4 py-2 rounded-full">
+                            <FeatherCheck size={16} />
+                            <span className="font-['Geist'] text-[13px] font-medium">Confirmed</span>
+                          </span>
+                        ) : booking.status === 'pending' ? (
+                          <span className="inline-flex items-center gap-1.5 bg-neutral-100 text-neutral-700 px-4 py-2 rounded-full">
+                            <div className="w-2 h-2 rounded-full bg-neutral-400"></div>
+                            <span className="font-['Geist'] text-[13px] font-medium">Pending</span>
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 bg-error-50 text-error-700 px-4 py-2 rounded-full">
+                            <FeatherX size={16} />
+                            <span className="font-['Geist'] text-[13px] font-medium">Cancelled</span>
+                          </span>
                         )}
                       </div>
                     </div>
-
-                    {/* Source Badge */}
-                    <div className="flex items-center gap-2">
-                      <span className="inline-flex items-center gap-1 bg-neutral-100 text-neutral-600 px-2 py-1 rounded-full">
-                        <span className="text-[12px]">💬</span>
-                        <span className="font-['Geist'] text-[11px] font-medium">WhatsApp</span>
-                      </span>
-                      <span className="font-['Geist'] text-[12px] text-neutral-400">
-                        {booking.created}
-                      </span>
-                    </div>
                   </div>
+                )
+              })}
+            </div>
+          )}
 
-                  {/* Status & Actions */}
-                  <div className="flex flex-col items-end gap-3">
-                    {/* Status Badge */}
-                    {booking.status === 'confirmed' ? (
-                      <span className="inline-flex items-center gap-1.5 bg-success-50 text-success-700 px-4 py-2 rounded-full">
-                        <FeatherCheck size={16} />
-                        <span className="font-['Geist'] text-[13px] font-medium">Confirmed</span>
-                      </span>
-                    ) : booking.status === 'pending' ? (
-                      <span className="inline-flex items-center gap-1.5 bg-neutral-100 text-neutral-700 px-4 py-2 rounded-full">
-                        <div className="w-2 h-2 rounded-full bg-neutral-400"></div>
-                        <span className="font-['Geist'] text-[13px] font-medium">Pending</span>
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1.5 bg-error-50 text-error-700 px-4 py-2 rounded-full">
-                        <FeatherX size={16} />
-                        <span className="font-['Geist'] text-[13px] font-medium">Cancelled</span>
-                      </span>
-                    )}
-
-                    {/* Action Buttons */}
-                    {booking.status === 'pending' && (
-                      <div className="flex gap-2">
-                        <Button variant="neutral-secondary" size="small">
-                          <FeatherX size={14} className="mr-1" />
-                          Decline
-                        </Button>
-                        <div className="flex items-center gap-2 rounded-full bg-brand-600 px-2 py-1 btn-hover-lift">
-                          <Button size="small">
-                            <FeatherCheck size={14} className="mr-1" />
-                            Confirm
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Empty State (when no bookings) */}
-          {filteredBookings.length === 0 && (
+          {!loading && bookings.length === 0 && (
             <div className="bg-white rounded-2xl p-12 md:p-16 border border-neutral-200 text-center">
               <div className="max-w-[400px] mx-auto">
                 <div className="w-16 h-16 rounded-full bg-neutral-100 flex items-center justify-center mx-auto mb-6">
@@ -286,13 +312,20 @@ function Bookings() {
                   <div className="bg-neutral-50 rounded-xl p-4 space-y-3">
                     <div className="flex items-center gap-3">
                       <FeatherUser size={18} className="text-neutral-400" />
-                      <span className="font-['Geist'] text-[15px] text-neutral-900">{selectedBooking.name}</span>
+                      <span className="font-['Geist'] text-[15px] text-neutral-900">{selectedBooking.customer_name}</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <FeatherPhone size={18} className="text-neutral-400" />
-                      <a href={`https://wa.me/${selectedBooking.phone.replace(/\s/g, '')}`} className="font-['Geist'] text-[15px] text-brand-600 hover:underline">
-                        {selectedBooking.phone}
-                      </a>
+                      {selectedBooking.customer_phone ? (
+                        <a
+                          href={`https://wa.me/${selectedBooking.customer_phone.replace(/\s/g, '')}`}
+                          className="font-['Geist'] text-[15px] text-brand-600 hover:underline"
+                        >
+                          {selectedBooking.customer_phone}
+                        </a>
+                      ) : (
+                        <span className="font-['Geist'] text-[15px] text-neutral-500">No phone provided</span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -305,13 +338,13 @@ function Bookings() {
                     <div className="flex items-center justify-between">
                       <span className="font-['Geist'] text-[14px] text-neutral-600">Date & Time</span>
                       <span className="font-['Geist'] text-[15px] font-medium text-neutral-900">
-                        {selectedBooking.date} at {selectedBooking.time}
+                        {formatterDate.format(new Date(selectedBooking.booking_time))} at {formatterTime.format(new Date(selectedBooking.booking_time))}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="font-['Geist'] text-[14px] text-neutral-600">Party Size</span>
                       <span className="font-['Geist'] text-[15px] font-medium text-neutral-900">
-                        {selectedBooking.people} people
+                        {selectedBooking.party_size} {selectedBooking.party_size === 1 ? 'person' : 'people'}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
@@ -323,7 +356,7 @@ function Bookings() {
                     <div className="flex items-center justify-between">
                       <span className="font-['Geist'] text-[14px] text-neutral-600">Created</span>
                       <span className="font-['Geist'] text-[15px] font-medium text-neutral-900">
-                        {selectedBooking.created}
+                        {formatRelative(selectedBooking.created_at)}
                       </span>
                     </div>
                   </div>

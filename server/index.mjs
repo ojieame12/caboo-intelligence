@@ -3,6 +3,10 @@ import cors from 'cors'
 import morgan from 'morgan'
 import dotenv from 'dotenv'
 import authRouter from './routes/auth.mjs'
+import dashboardRouter from './routes/dashboard.mjs'
+import bookingsRouter from './routes/bookings.mjs'
+import settingsRouter from './routes/settings.mjs'
+import userRouter from './routes/user.mjs'
 
 dotenv.config()
 
@@ -22,6 +26,10 @@ app.use(express.json())
 app.use(morgan('tiny'))
 
 app.use('/api', authRouter)
+app.use('/api', dashboardRouter)
+app.use('/api', bookingsRouter)
+app.use('/api', settingsRouter)
+app.use('/api', userRouter)
 
 const PORT = process.env.PORT || 4000
 

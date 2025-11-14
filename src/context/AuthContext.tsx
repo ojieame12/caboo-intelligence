@@ -3,7 +3,16 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 type RestaurantInfo = {
   id: string
   name: string
+  ownerName?: string
   status: string
+  whatsappNumber?: string
+  notificationDestination?: string
+  notificationNumber?: string | null
+  notificationEmail?: string | null
+  remindersEnabled?: boolean
+  reminderTiming?: string
+  businessHours?: Record<string, unknown>
+  trialEndsAt?: string
 }
 
 type AuthState = {
@@ -18,6 +27,7 @@ type AuthContextValue = {
   loading: boolean
   login: (payload: AuthState) => void
   logout: () => void
+  updateRestaurant: (restaurant: Partial<RestaurantInfo>) => void
 }
 
 const STORAGE_KEY = 'caboo-auth'
@@ -56,7 +66,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }
 
-  const value = useMemo(() => ({ user, loading, login, logout }), [user, loading])
+  const updateRestaurant = (restaurant: Partial<RestaurantInfo>) => {
+    setUser((prev) => {
+      if (!prev) return prev
+      const updated = { ...prev, restaurant: { ...prev.restaurant, ...restaurant } }
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
+      }
+      return updated
+    })
+  }
+
+  const value = useMemo(
+    () => ({ user, loading, login, logout, updateRestaurant }),
+    [user, loading],
+  )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

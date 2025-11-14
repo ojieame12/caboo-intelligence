@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { randomUUID } from 'node:crypto'
 import { pool } from '../db.mjs'
+import { mapRestaurant } from './utils.mjs'
 
 const router = Router()
 
@@ -18,6 +19,66 @@ function buildToken(payload) {
 
 function sanitizeEmail(email = '') {
   return email.trim().toLowerCase()
+}
+
+async function insertSampleBookings(client, restaurantId) {
+  const base = new Date()
+  base.setMinutes(0, 0, 0)
+
+  const samples = [
+    {
+      customer_name: 'Sarah Chen',
+      customer_phone: '+27 82 123 4567',
+      party_size: 4,
+      booking_time: new Date(base.getTime() + 2 * 60 * 60 * 1000), // +2h today
+      status: 'confirmed',
+      source: 'whatsapp',
+      notes: 'Birthday dinner, vegetarian option needed',
+    },
+    {
+      customer_name: 'Marco Silva',
+      customer_phone: '+27 83 456 7890',
+      party_size: 2,
+      booking_time: new Date(base.getTime() + 4 * 60 * 60 * 1000),
+      status: 'pending',
+      source: 'whatsapp',
+      notes: '',
+    },
+    {
+      customer_name: 'Nandi Dlamini',
+      customer_phone: '+27 84 789 0123',
+      party_size: 5,
+      booking_time: new Date(base.getTime() + 28 * 60 * 60 * 1000), // tomorrow
+      status: 'confirmed',
+      source: 'whatsapp',
+      notes: '',
+    },
+  ]
+
+  for (const sample of samples) {
+    await client.query(
+      `INSERT INTO bookings (
+        restaurant_id,
+        customer_name,
+        customer_phone,
+        party_size,
+        booking_time,
+        status,
+        source,
+        notes
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
+      [
+        restaurantId,
+        sample.customer_name,
+        sample.customer_phone,
+        sample.party_size,
+        sample.booking_time.toISOString(),
+        sample.status,
+        sample.source,
+        sample.notes,
+      ],
+    )
+  }
 }
 
 router.post('/signup', async (req, res) => {
@@ -52,11 +113,44 @@ router.post('/signup', async (req, res) => {
 
     await client.query(
       `INSERT INTO restaurants (
-        id, user_id, name, owner_name, whatsapp_number, status, trial_ends_at
+        id,
+        user_id,
+        name,
+        owner_name,
+        whatsapp_number,
+        status,
+        trial_ends_at,
+        notification_destination,
+        notification_number,
+        notification_email,
+        reminders_enabled,
+        reminder_timing,
+        business_hours
       )
-      VALUES ($1, $2, $3, $4, $5, 'pending_whatsapp', $6)`,
-      [restaurantId, userId, restaurantName.trim(), ownerName.trim(), whatsappNumber.trim(), trialEndsAt],
+      VALUES (
+        $1,$2,$3,$4,$5,'pending_whatsapp',$6,'same',NULL,NULL,TRUE,'3h',
+        $7
+      )`,
+      [
+        restaurantId,
+        userId,
+        restaurantName.trim(),
+        ownerName.trim(),
+        whatsappNumber.trim(),
+        trialEndsAt,
+        JSON.stringify({
+          mon: { open: '17:00', close: '23:00', closed: false },
+          tue: { open: '17:00', close: '23:00', closed: false },
+          wed: { open: '17:00', close: '23:00', closed: false },
+          thu: { open: '17:00', close: '23:00', closed: false },
+          fri: { open: '17:00', close: '23:00', closed: false },
+          sat: { open: '12:00', close: '23:00', closed: false },
+          sun: { open: '12:00', close: '22:00', closed: false },
+        }),
+      ],
     )
+
+    await insertSampleBookings(client, restaurantId)
 
     await client.query('COMMIT')
 
@@ -72,8 +166,12 @@ router.post('/signup', async (req, res) => {
       restaurant: {
         id: restaurantId,
         name: restaurantName.trim(),
+        ownerName: ownerName.trim(),
         whatsappNumber: whatsappNumber.trim(),
         status: 'pending_whatsapp',
+        notificationDestination: 'same',
+        remindersEnabled: true,
+        reminderTiming: '3h',
         trialEndsAt,
       },
     })
@@ -97,7 +195,21 @@ router.post('/login', async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT u.id as user_id, u.password_hash, r.id as restaurant_id, r.name as restaurant_name, r.status
+      `SELECT 
+        u.id as user_id,
+        u.password_hash,
+        r.id as restaurant_id,
+        r.name,
+        r.owner_name,
+        r.status,
+        r.whatsapp_number,
+        r.notification_destination,
+        r.notification_number,
+        r.notification_email,
+        r.reminders_enabled,
+        r.reminder_timing,
+        r.business_hours,
+        r.trial_ends_at
        FROM users u
        JOIN restaurants r ON r.user_id = u.id
        WHERE u.email = $1
@@ -127,11 +239,20 @@ router.post('/login', async (req, res) => {
         id: record.user_id,
         email: normalizedEmail,
       },
-      restaurant: {
+      restaurant: mapRestaurant({
         id: record.restaurant_id,
-        name: record.restaurant_name,
+        name: record.name,
+        owner_name: record.owner_name,
         status: record.status,
-      },
+        whatsapp_number: record.whatsapp_number,
+        notification_destination: record.notification_destination,
+        notification_number: record.notification_number,
+        notification_email: record.notification_email,
+        reminders_enabled: record.reminders_enabled,
+        reminder_timing: record.reminder_timing,
+        business_hours: record.business_hours,
+        trial_ends_at: record.trial_ends_at,
+      }),
     })
   } catch (error) {
     console.error('Login error', error)
