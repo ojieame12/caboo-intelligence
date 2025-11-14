@@ -7,6 +7,7 @@ import dashboardRouter from './routes/dashboard.mjs'
 import bookingsRouter from './routes/bookings.mjs'
 import settingsRouter from './routes/settings.mjs'
 import userRouter from './routes/user.mjs'
+import webhookRouter from './routes/webhook.mjs'
 
 dotenv.config()
 
@@ -30,8 +31,13 @@ app.use('/api', dashboardRouter)
 app.use('/api', bookingsRouter)
 app.use('/api', settingsRouter)
 app.use('/api', userRouter)
+app.use('/', webhookRouter)
 
 const PORT = process.env.PORT || 4000
+
+if (process.env.ENABLE_REMINDERS === 'true') {
+  import('./jobs/reminders.mjs').then(({ startReminderJob }) => startReminderJob())
+}
 
 app.listen(PORT, () => {
   console.log(`API server running on http://localhost:${PORT}`)

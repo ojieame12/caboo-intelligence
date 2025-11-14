@@ -1,32 +1,58 @@
-import React, { useState } from "react";
+import React, { useMemo } from "react";
 import { Button } from "@/subframe/components/Button";
 import { AnimatedInput } from "@/components/AnimatedInput";
 import { AnimatedTextArea } from "@/components/AnimatedTextArea";
 import { FeatherCheck, FeatherAlertCircle, FeatherDownload, FeatherTrash2 } from "@subframe/core";
 import { useAuthContext } from "@/context/AuthContext";
+import { useSettingsData } from "@/hooks/useSettingsData";
 
 function Settings() {
   const { user, logout } = useAuthContext();
+  const {
+    connectedNumber,
+    alertDestination,
+    otherNumber,
+    emailNotifications,
+    notificationEmail,
+    remindersEnabled,
+    reminderTiming,
+    hours,
+    loading,
+    saving,
+    error,
+    success,
+    setAlertDestination,
+    setOtherNumber,
+    setEmailNotifications,
+    setNotificationEmail,
+    setRemindersEnabled,
+    setReminderTiming,
+    setHours,
+    saveSettings,
+  } = useSettingsData();
 
-  // Mock state
-  const [connectedNumber, setConnectedNumber] = useState("+27 82 123 4567");
-  const [alertDestination, setAlertDestination] = useState("same");
-  const [otherNumber, setOtherNumber] = useState("");
-  const [emailNotifications, setEmailNotifications] = useState(true);
-  const [notificationEmail, setNotificationEmail] = useState("owner@restaurant.com");
+  const disableInputs = loading || saving;
 
-  const [remindersEnabled, setRemindersEnabled] = useState(true);
-  const [reminderTiming, setReminderTiming] = useState("3h");
+  const trialBadge = useMemo(() => {
+    const trialEnd = user?.restaurant?.trialEndsAt;
+    if (!trialEnd) return "Trial active";
+    const diff = Math.ceil((new Date(trialEnd).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+    return diff > 0 ? `Trial: ${diff} day${diff === 1 ? "" : "s"} left` : "Trial ended";
+  }, [user?.restaurant?.trialEndsAt]);
 
-  const [hours, setHours] = useState({
-    mon: { open: "17:00", close: "23:00", closed: false },
-    tue: { open: "17:00", close: "23:00", closed: false },
-    wed: { open: "17:00", close: "23:00", closed: false },
-    thu: { open: "17:00", close: "23:00", closed: false },
-    fri: { open: "17:00", close: "23:00", closed: false },
-    sat: { open: "12:00", close: "23:00", closed: false },
-    sun: { open: "12:00", close: "22:00", closed: false },
-  });
+  const handleHourChange = (day: string, field: "open" | "close", value: string) => {
+    setHours((prev) => ({
+      ...prev,
+      [day]: { ...prev[day], [field]: value },
+    }));
+  };
+
+  const toggleClosed = (day: string) => {
+    setHours((prev) => ({
+      ...prev,
+      [day]: { ...prev[day], closed: !prev[day].closed },
+    }));
+  };
 
   return (
     <div className="flex h-full min-h-screen w-full flex-col bg-default-background">
@@ -58,7 +84,7 @@ function Settings() {
             <div className="hidden md:flex items-center gap-2 bg-success-50 border border-success-200 rounded-full px-4 py-2">
               <div className="w-2 h-2 rounded-full bg-success-600 animate-pulse"></div>
               <span className="font-['Geist'] text-[13px] font-medium text-success-700">
-                Trial: 12 days left
+                {trialBadge}
               </span>
             </div>
             <button
@@ -84,6 +110,20 @@ function Settings() {
               Configure your WhatsApp assistant and manage your subscription
             </p>
           </div>
+
+          {error && (
+            <div className="bg-error-50 border border-error-200 text-error-700 rounded-2xl p-4 mb-6 flex items-center gap-3">
+              <FeatherAlertCircle size={18} />
+              <span className="font-['Geist'] text-[14px]">{error}</span>
+            </div>
+          )}
+
+          {success && (
+            <div className="bg-success-50 border border-success-200 text-success-700 rounded-2xl p-4 mb-6 flex items-center gap-3">
+              <FeatherCheck size={18} />
+              <span className="font-['Geist'] text-[14px]">{success}</span>
+            </div>
+          )}
 
           <div className="space-y-8">
 
@@ -132,6 +172,7 @@ function Settings() {
                       checked={alertDestination === "same"}
                       onChange={(e) => setAlertDestination(e.target.value)}
                       className="mt-1 accent-brand-600"
+                      disabled={disableInputs}
                     />
                     <div>
                       <p className="font-['Geist'] text-[15px] font-medium text-neutral-900">This WhatsApp number</p>
@@ -147,6 +188,7 @@ function Settings() {
                       checked={alertDestination === "different"}
                       onChange={(e) => setAlertDestination(e.target.value)}
                       className="mt-1 accent-brand-600"
+                      disabled={disableInputs}
                     />
                     <div className="flex-1">
                       <p className="font-['Geist'] text-[15px] font-medium text-neutral-900 mb-3">Different WhatsApp number</p>
@@ -156,6 +198,7 @@ function Settings() {
                           value={otherNumber}
                           onChange={(e) => setOtherNumber(e.target.value)}
                           placeholder="+27 XX XXX XXXX"
+                          disabled={disableInputs}
                         />
                       )}
                     </div>
@@ -170,19 +213,21 @@ function Settings() {
                       checked={emailNotifications}
                       onChange={(e) => setEmailNotifications(e.target.checked)}
                       className="accent-brand-600 w-5 h-5"
+                      disabled={disableInputs}
                     />
                     <span className="font-['Geist'] text-[15px] font-medium text-neutral-900">
                       Also email me booking alerts
                     </span>
                   </label>
                   {emailNotifications && (
-                    <AnimatedInput
-                      label="Email address"
-                      type="email"
-                      value={notificationEmail}
-                      onChange={(e) => setNotificationEmail(e.target.value)}
-                      placeholder="owner@restaurant.com"
-                    />
+                      <AnimatedInput
+                        label="Email address"
+                        type="email"
+                        value={notificationEmail}
+                        onChange={(e) => setNotificationEmail(e.target.value)}
+                        placeholder="owner@restaurant.com"
+                        disabled={disableInputs}
+                      />
                   )}
                 </div>
               </div>
@@ -201,25 +246,35 @@ function Settings() {
                         </p>
                       </div>
                       <div className="flex items-center gap-2 flex-1">
-                        <input
-                          type="time"
-                          value={times.open}
-                          disabled={times.closed}
-                          className="px-3 py-2 border-b border-neutral-200 focus:border-brand-600 outline-none transition-colors font-['Geist'] text-[14px] disabled:opacity-50"
-                        />
-                        <span className="font-['Geist'] text-[14px] text-neutral-600">to</span>
-                        <input
-                          type="time"
-                          value={times.close}
-                          disabled={times.closed}
-                          className="px-3 py-2 border-b border-neutral-200 focus:border-brand-600 outline-none transition-colors font-['Geist'] text-[14px] disabled:opacity-50"
-                        />
+                        {times.closed ? (
+                          <span className="font-['Geist'] text-[13px] text-neutral-500">Closed for this day</span>
+                        ) : (
+                          <>
+                            <input
+                              type="time"
+                              value={times.open}
+                              disabled={disableInputs}
+                              onChange={(e) => handleHourChange(day, "open", e.target.value)}
+                              className="bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 font-['Geist'] text-[14px] font-medium text-neutral-900"
+                            />
+                            <span className="font-['Geist'] text-[13px] text-neutral-500">to</span>
+                            <input
+                              type="time"
+                              value={times.close}
+                              disabled={disableInputs}
+                              onChange={(e) => handleHourChange(day, "close", e.target.value)}
+                              className="bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 font-['Geist'] text-[14px] font-medium text-neutral-900"
+                            />
+                          </>
+                        )}
                       </div>
                       <label className="flex items-center gap-2 cursor-pointer">
                         <input
                           type="checkbox"
                           checked={times.closed}
+                          onChange={() => toggleClosed(day)}
                           className="accent-brand-600"
+                          disabled={disableInputs}
                         />
                         <span className="font-['Geist'] text-[13px] text-neutral-600">Closed</span>
                       </label>
@@ -230,7 +285,7 @@ function Settings() {
 
               <div className="mt-8 pt-6 border-t border-neutral-200">
                 <div className="flex items-center gap-2 rounded-full bg-brand-600 px-2 py-1 btn-hover-lift max-w-[200px]">
-                  <Button size="medium">
+                  <Button size="medium" disabled={disableInputs} onClick={saveSettings}>
                     Save Changes
                   </Button>
                 </div>

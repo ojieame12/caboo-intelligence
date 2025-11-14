@@ -102,7 +102,7 @@ export function useSettingsData() {
     notificationEmail,
     remindersEnabled,
     reminderTiming,
-    businessHours,
+    hours: businessHours,
     loading,
     saving,
     error,
@@ -113,7 +113,7 @@ export function useSettingsData() {
     setNotificationEmail,
     setRemindersEnabled,
     setReminderTiming,
-    setBusinessHours,
+    setHours: setBusinessHours,
     saveSettings,
   }
 }

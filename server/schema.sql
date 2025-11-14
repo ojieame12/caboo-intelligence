@@ -27,6 +27,9 @@ CREATE TABLE IF NOT EXISTS restaurants (
 
 CREATE UNIQUE INDEX IF NOT EXISTS restaurants_whatsapp_number_key ON restaurants(whatsapp_number);
 
+ALTER TABLE restaurants
+  ADD COLUMN IF NOT EXISTS messagebird_channel_id TEXT;
+
 ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS notification_destination TEXT NOT NULL DEFAULT 'same';
 ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS notification_number TEXT;
 ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS notification_email TEXT;
@@ -45,7 +48,18 @@ CREATE TABLE IF NOT EXISTS bookings (
   status TEXT NOT NULL DEFAULT 'pending',
   source TEXT NOT NULL DEFAULT 'whatsapp',
   notes TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  reminder_sent_at TIMESTAMP WITH TIME ZONE
 );
 
 CREATE INDEX IF NOT EXISTS bookings_restaurant_time_idx ON bookings(restaurant_id, booking_time);
+
+CREATE TABLE IF NOT EXISTS conversation_states (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  restaurant_id UUID NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
+  customer_phone TEXT NOT NULL,
+  state TEXT NOT NULL,
+  data JSONB DEFAULT '{}'::jsonb,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE (restaurant_id, customer_phone)
+);
