@@ -83,9 +83,12 @@ function SignUp() {
             </a>
           </div>
 
-          <div className="flex items-center gap-3">
-            <a href="/signin" className="font-['Inter'] text-[14px] font-[400] text-neutral-600 hover:text-neutral-900 transition-colors">
-              Already have an account? Sign in
+          <div className="flex items-center gap-2">
+            <span className="font-['Inter'] text-[14px] font-[400] text-neutral-600">
+              Already have an account?
+            </span>
+            <a href="/signin" className="font-['Inter'] text-[14px] font-[400] text-brand-600 hover:text-brand-700 transition-colors">
+              Sign in
             </a>
           </div>
         </div>
