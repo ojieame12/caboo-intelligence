@@ -1,0 +1,26 @@
+/* pxGrotesk Font */
+@font-face {
+  font-family: 'pxGroteskFont';
+  src: url('./fonts/pxGroteskFont-normal-400-100.ttf') format('truetype');
+  font-weight: 300 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Season Mix TRIAL Font */
+@font-face {
+  font-family: 'Season Mix TRIAL';
+  src: url('./fonts/TXlefX7W8sjgaFnFk9lqJhsRco.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Saans Light Font */
+@font-face {
+  font-family: 'Saans';
+  src: url('./fonts/Saans Light-normal-570-100.ttf') format('truetype');
+  font-weight: 300 570;
+  font-style: normal;
+  font-display: swap;
+}
