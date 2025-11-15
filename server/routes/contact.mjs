@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { Resend } from 'resend';
+import { contactFormEmail } from '../templates/email-base.mjs';
 
 const router = Router();
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
@@ -13,23 +14,13 @@ router.post('/contact', async (req, res) => {
 
   try {
     if (resend) {
-      // Send email via Resend
+      // Send email via Resend with branded template
       await resend.emails.send({
-        from: 'Caboo Contact Form <support@caboo.design>',
-        to: 'support@caboo.design',
+        from: 'Caboo Support <support@caboo.design>',
+        to: 'nathanojieame@gmail.com',
         replyTo: email,
         subject: `Contact from ${name}${restaurant ? ` (${restaurant})` : ''}`,
-        html: `
-          <h2>New Contact Form Submission</h2>
-          <p><strong>From:</strong> ${name}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          ${restaurant ? `<p><strong>Restaurant:</strong> ${restaurant}</p>` : ''}
-          <hr />
-          <p><strong>Message:</strong></p>
-          <p>${message.replace(/\n/g, '<br>')}</p>
-          <hr />
-          <p style="color: #666; font-size: 12px;">Sent from caboo.design contact form</p>
-        `
+        html: contactFormEmail({ name, email, restaurant, message })
       });
       console.log(`✅ Email sent to support@caboo.design from ${email}`);
     } else {
