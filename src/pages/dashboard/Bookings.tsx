@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Button } from "@/subframe/components/Button";
 import { AnimatedInput } from "@/components/AnimatedInput";
+import { AnimatedTextArea } from "@/components/AnimatedTextArea";
 import { FeatherCheck, FeatherX, FeatherCalendar, FeatherUser, FeatherPhone } from "@subframe/core";
 import { useAuthContext } from "@/context/AuthContext";
 import { useBookings } from "@/hooks/useBookings";
@@ -18,13 +19,30 @@ type Booking = {
 };
 
 function Bookings() {
-  const { logout } = useAuthContext();
+  const { user, logout } = useAuthContext();
   const [activeFilter, setActiveFilter] = useState("today");
   const [search, setSearch] = useState("");
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
-  const { bookings, loading, error, updateStatus } = useBookings(activeFilter, search);
+  const { bookings, loading, error, updateStatus, addBooking } = useBookings(activeFilter, search);
   const [actioningId, setActioningId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [showNew, setShowNew] = useState(false);
+  const [newBooking, setNewBooking] = useState({
+    customerName: "",
+    customerPhone: "",
+    partySize: 2,
+    date: "",
+    time: "",
+    notes: "",
+  });
+  const [newError, setNewError] = useState<string | null>(null);
+  const [savingNew, setSavingNew] = useState(false);
+  const trialBadge = useMemo(() => {
+    const trialEnd = user?.restaurant?.trialEndsAt;
+    if (!trialEnd) return "Trial active";
+    const diff = Math.ceil((new Date(trialEnd).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+    return diff > 0 ? `Trial: ${diff} day${diff === 1 ? "" : "s"} left` : "Trial ended";
+  }, [user?.restaurant?.trialEndsAt]);
 
   const formatterDate = useMemo(
     () =>
@@ -88,6 +106,42 @@ function Bookings() {
     }
   };
 
+  const handleNewBooking = async () => {
+    setNewError(null);
+    if (!newBooking.customerName || !newBooking.date || !newBooking.time || !newBooking.partySize) {
+      setNewError("Name, date, time, and party size are required");
+      return;
+    }
+    const bookingTime = new Date(`${newBooking.date}T${newBooking.time}`);
+    if (Number.isNaN(bookingTime.getTime())) {
+      setNewError("Please provide a valid date and time");
+      return;
+    }
+    setSavingNew(true);
+    try {
+      await addBooking({
+        customerName: newBooking.customerName,
+        customerPhone: newBooking.customerPhone || undefined,
+        partySize: Number(newBooking.partySize) || 2,
+        bookingTime: bookingTime.toISOString(),
+        notes: newBooking.notes || undefined,
+      });
+      setShowNew(false);
+      setNewBooking({
+        customerName: "",
+        customerPhone: "",
+        partySize: 2,
+        date: "",
+        time: "",
+        notes: "",
+      });
+    } catch (err) {
+      setNewError(err instanceof Error ? err.message : "Unable to add booking");
+    } finally {
+      setSavingNew(false);
+    }
+  };
+
   return (
     <div className="flex h-full min-h-screen w-full flex-col bg-default-background">
       {/* Navbar */}
@@ -118,7 +172,7 @@ function Bookings() {
             <div className="hidden md:flex items-center gap-2 bg-success-50 border border-success-200 rounded-full px-4 py-2">
               <div className="w-2 h-2 rounded-full bg-success-600 animate-pulse"></div>
               <span className="font-['Geist'] text-[13px] font-medium text-success-700">
-                Trial: 12 days left
+                {trialBadge}
               </span>
             </div>
             <button
@@ -168,13 +222,22 @@ function Bookings() {
               </div>
 
               {/* Search */}
-              <div className="w-full md:w-64">
-                <AnimatedInput
-                  label="Search"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Name or phone..."
-                />
+              <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto md:items-center">
+                <div className="w-full sm:w-64">
+                  <AnimatedInput
+                    label="Search"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Name or phone..."
+                  />
+                </div>
+                <Button
+                  size="medium"
+                  onClick={() => setShowNew(true)}
+                  className="w-full sm:w-auto"
+                >
+                  Add booking
+                </Button>
               </div>
             </div>
           </div>
@@ -262,6 +325,102 @@ function Bookings() {
           )}
         </div>
       </div>
+
+      {/* New Booking Modal */}
+      {showNew && (
+        <div className="fixed inset-0 bg-neutral-900/50 backdrop-blur-sm z-50 animate-fade-in" onClick={() => setShowNew(false)}>
+          <div
+            className="max-w-xl w-full mx-auto mt-16 bg-white rounded-2xl shadow-2xl border border-neutral-200 overflow-hidden animate-fade-in-up"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between p-6 md:p-8">
+              <div>
+                <p className="font-['Season_Mix_TRIAL'] text-[26px] md:text-[30px] text-neutral-900 leading-tight">
+                  Add booking
+                </p>
+                <p className="font-['Geist'] text-[14px] text-neutral-600 mt-1">
+                  Log a phone call or walk-in so everything stays in one place.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowNew(false)}
+                className="w-9 h-9 rounded-full bg-neutral-100 hover:bg-neutral-200 flex items-center justify-center transition-colors"
+              >
+                <FeatherX size={18} className="text-neutral-600" />
+              </button>
+            </div>
+
+            {newError && (
+              <div className="mx-6 md:mx-8 mb-4 bg-error-50 border border-error-200 text-error-700 rounded-xl p-3 text-sm">
+                {newError}
+              </div>
+            )}
+
+            <div className="p-6 md:p-8 space-y-4">
+              <AnimatedInput
+                label="Guest name"
+                value={newBooking.customerName}
+                onChange={(e) => setNewBooking({ ...newBooking, customerName: e.target.value })}
+                placeholder="e.g. Thabo"
+              />
+
+              <AnimatedInput
+                label="Phone (WhatsApp preferred)"
+                value={newBooking.customerPhone}
+                onChange={(e) => setNewBooking({ ...newBooking, customerPhone: e.target.value })}
+                placeholder="+27 82 XXX XXXX"
+              />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <AnimatedInput
+                  label="Party size"
+                  type="number"
+                  min={1}
+                  value={newBooking.partySize}
+                  onChange={(e) => setNewBooking({ ...newBooking, partySize: Number(e.target.value) || 1 })}
+                />
+                <div className="grid grid-cols-2 gap-3">
+                  <AnimatedInput
+                    label="Date"
+                    type="date"
+                    value={newBooking.date}
+                    onChange={(e) => setNewBooking({ ...newBooking, date: e.target.value })}
+                  />
+                  <AnimatedInput
+                    label="Time"
+                    type="time"
+                    value={newBooking.time}
+                    onChange={(e) => setNewBooking({ ...newBooking, time: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <AnimatedTextArea
+                label="Notes (optional)"
+                value={newBooking.notes}
+                onChange={(e) => setNewBooking({ ...newBooking, notes: e.target.value })}
+                placeholder="Allergies, occasion, special requests..."
+              />
+
+              <div className="pt-4 border-t border-neutral-200 flex flex-col sm:flex-row justify-end gap-3">
+                <Button variant="neutral-secondary" size="medium" onClick={() => setShowNew(false)} className="w-full sm:w-auto">
+                  Cancel
+                </Button>
+                <div className="flex-1 sm:flex-none flex items-center gap-2 rounded-full bg-brand-600 px-2 py-1 btn-hover-lift">
+                  <Button
+                    size="medium"
+                    className="w-full sm:w-auto"
+                    disabled={savingNew}
+                    onClick={handleNewBooking}
+                  >
+                    {savingNew ? "Saving..." : "Save booking"}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Booking Details Side Panel */}
       {selectedBooking && (

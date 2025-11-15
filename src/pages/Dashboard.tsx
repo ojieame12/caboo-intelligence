@@ -63,7 +63,7 @@ const fallbackSummary: DashboardSummary = {
 function Dashboard() {
   const { logout } = useAuthContext();
   const { data, loading, error } = useDashboardSummary();
-  const summary = data && data.today.length ? data : fallbackSummary;
+  const summary = data && (data.today.length || data.tomorrow.length) ? data : fallbackSummary;
 
   const trialBadge = useMemo(() => {
     if (!summary?.trial?.trialEndsAt) return "Trial active";

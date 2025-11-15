@@ -60,8 +60,42 @@ export function useBookings(filter: string, search: string) {
     return result.booking
   }
 
+  const addBooking = async ({
+    customerName,
+    customerPhone,
+    partySize,
+    bookingTime,
+    notes,
+  }: {
+    customerName: string
+    customerPhone?: string
+    partySize: number
+    bookingTime: string
+    notes?: string
+  }) => {
+    if (!user?.token) {
+      throw new Error('Not authenticated')
+    }
+    const result = await api.post<{ booking: BookingRecord }>(
+      '/api/bookings',
+      {
+        customerName,
+        customerPhone,
+        partySize,
+        bookingTime,
+        notes,
+      },
+      user.token,
+    )
+    setBookings((prev) => {
+      const next = [result.booking, ...prev]
+      return next.sort((a, b) => new Date(a.booking_time).getTime() - new Date(b.booking_time).getTime())
+    })
+    return result.booking
+  }
+
   return useMemo(
-    () => ({ bookings, loading, error, updateStatus }),
+    () => ({ bookings, loading, error, updateStatus, addBooking }),
     [bookings, loading, error],
   )
 }
