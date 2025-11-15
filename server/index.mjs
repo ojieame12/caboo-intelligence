@@ -9,6 +9,7 @@ import settingsRouter from './routes/settings.mjs'
 import userRouter from './routes/user.mjs'
 import webhookRouter from './routes/webhook.mjs'
 import contactRouter from './routes/contact.mjs'
+import testRouter from './routes/test.mjs'
 
 dotenv.config()
 
@@ -33,6 +34,7 @@ app.use('/api', bookingsRouter)
 app.use('/api', settingsRouter)
 app.use('/api', userRouter)
 app.use('/api', contactRouter)
+app.use('/api', testRouter)
 app.use('/', webhookRouter)
 
 const PORT = process.env.PORT || 4000
