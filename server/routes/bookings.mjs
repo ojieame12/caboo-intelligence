@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { pool } from '../db.mjs'
 import { authenticate } from '../middleware/auth.mjs'
+import { sendWhatsAppMessage } from '../lib/messaging.mjs'
 
 const router = Router()
 
@@ -114,6 +115,56 @@ router.put('/bookings/:id', authenticate, async (req, res) => {
   } catch (error) {
     console.error('Booking update error', error)
     res.status(500).json({ message: 'Unable to update booking' })
+  }
+})
+
+router.post('/bookings/:id/resend', authenticate, async (req, res) => {
+  const { restaurantId } = req.auth
+  const { id } = req.params
+
+  try {
+    const result = await pool.query(
+      `SELECT b.id,
+              b.customer_name,
+              b.customer_phone,
+              b.booking_time,
+              r.name as restaurant_name,
+              r.timezone
+       FROM bookings b
+       JOIN restaurants r ON r.id = b.restaurant_id
+       WHERE b.id = $1 AND b.restaurant_id = $2
+       LIMIT 1`,
+      [id, restaurantId],
+    )
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Booking not found' })
+    }
+
+    const booking = result.rows[0]
+    if (!booking.customer_phone) {
+      return res.status(400).json({ message: 'No customer phone to send to' })
+    }
+
+    const formattedTime = new Intl.DateTimeFormat('en-ZA', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+      timeZone: booking.timezone || 'Africa/Johannesburg',
+    }).format(new Date(booking.booking_time))
+
+    await sendWhatsAppMessage({
+      to: booking.customer_phone,
+      body: `Reminder: ${booking.restaurant_name} has your booking for ${formattedTime}. Reply CANCEL if plans change.`,
+    })
+
+    res.json({ message: 'Confirmation resent' })
+  } catch (error) {
+    console.error('Booking resend error', error)
+    res.status(500).json({ message: 'Unable to resend confirmation' })
   }
 })
 

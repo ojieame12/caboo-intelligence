@@ -23,7 +23,7 @@ function Bookings() {
   const [activeFilter, setActiveFilter] = useState("today");
   const [search, setSearch] = useState("");
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
-  const { bookings, loading, error, updateStatus, addBooking } = useBookings(activeFilter, search);
+  const { bookings, loading, error, updateStatus, addBooking, resendConfirmation } = useBookings(activeFilter, search);
   const [actioningId, setActioningId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [showNew, setShowNew] = useState(false);
@@ -101,6 +101,18 @@ function Bookings() {
       setSelectedBooking((prev) => (prev && prev.id === booking.id ? { ...prev, status: updated.status } : prev));
     } catch (err) {
       setActionError(err instanceof Error ? err.message : "Action failed");
+    } finally {
+      setActioningId(null);
+    }
+  };
+
+  const handleResend = async (booking: Booking) => {
+    setActioningId(booking.id);
+    setActionError(null);
+    try {
+      await resendConfirmation(booking.id);
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Unable to resend");
     } finally {
       setActioningId(null);
     }
@@ -560,7 +572,13 @@ function Bookings() {
 
               {/* Actions */}
               <div className="mt-8 pt-6 border-t border-neutral-200 space-y-3">
-                <Button variant="neutral-secondary" size="medium" className="w-full" disabled>
+                <Button
+                  variant="neutral-secondary"
+                  size="medium"
+                  className="w-full"
+                  disabled={actioningId === selectedBooking.id}
+                  onClick={() => handleResend(selectedBooking)}
+                >
                   Resend Confirmation
                 </Button>
                 <Button

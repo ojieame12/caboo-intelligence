@@ -60,6 +60,14 @@ export function useBookings(filter: string, search: string) {
     return result.booking
   }
 
+  const resendConfirmation = async (id: string) => {
+    if (!user?.token) {
+      throw new Error('Not authenticated')
+    }
+    await api.post(`/api/bookings/${id}/resend`, {}, user.token)
+    return true
+  }
+
   const addBooking = async ({
     customerName,
     customerPhone,
@@ -95,7 +103,7 @@ export function useBookings(filter: string, search: string) {
   }
 
   return useMemo(
-    () => ({ bookings, loading, error, updateStatus, addBooking }),
+    () => ({ bookings, loading, error, updateStatus, addBooking, resendConfirmation }),
     [bookings, loading, error],
   )
 }
