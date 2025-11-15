@@ -1,9 +1,19 @@
 import { Router } from 'express';
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 import { contactFormEmail } from '../templates/email-base.mjs';
 
 const router = Router();
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+
+// Create Zoho SMTP transporter
+const transporter = process.env.ZOHO_SMTP_PASSWORD ? nodemailer.createTransport({
+  host: 'smtp.zoho.com',
+  port: 587,
+  secure: false, // Use TLS
+  auth: {
+    user: 'support@caboo.design',
+    pass: process.env.ZOHO_SMTP_PASSWORD
+  }
+}) : null;
 
 router.post('/contact', async (req, res) => {
   const { name, email, restaurant, message } = req.body;
@@ -13,19 +23,19 @@ router.post('/contact', async (req, res) => {
   }
 
   try {
-    if (resend) {
-      // Send email via Resend with branded template
-      await resend.emails.send({
+    if (transporter) {
+      // Send email via Zoho SMTP with branded template
+      await transporter.sendMail({
         from: 'Caboo Support <support@caboo.design>',
-        to: 'nathanojieame@gmail.com',
+        to: 'support@caboo.design', // Send to Zoho inbox
         replyTo: email,
         subject: `Contact from ${name}${restaurant ? ` (${restaurant})` : ''}`,
         html: contactFormEmail({ name, email, restaurant, message })
       });
-      console.log(`✅ Email sent to support@caboo.design from ${email}`);
+      console.log(`✅ Email sent from support@caboo.design (via Zoho SMTP)`);
     } else {
-      // Fallback: just log if Resend not configured
-      console.log('📧 Contact form submission (Resend not configured):');
+      // Fallback: just log if SMTP not configured
+      console.log('📧 Contact form submission (Zoho SMTP not configured):');
       console.log(`From: ${name} <${email}>`);
       console.log(`Restaurant: ${restaurant || 'Not provided'}`);
       console.log(`Message: ${message}`);
