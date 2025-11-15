@@ -395,11 +395,11 @@ function LandingPage() {
             </p>
           </div>
 
-          <div className="max-w-[900px]">
+          <div className="max-w-[95%] md:max-w-[600px] lg:max-w-[700px]">
             <Accordion
               trigger={
                 <div className="flex w-full items-center justify-between border-b border-neutral-border py-6 hover:border-brand-600 transition-colors cursor-pointer">
-                  <span className="font-['Season_Mix_TRIAL'] text-[24px] font-[400] text-neutral-900">
+                  <span className="font-['Season_Mix_TRIAL'] text-[20px] md:text-[22px] lg:text-[24px] font-[400] text-neutral-900">
                     Smart booking conversations
                   </span>
                   <FeatherArrowRight className="text-neutral-400" size={24} />
