@@ -22,7 +22,9 @@ function Bookings() {
   const [activeFilter, setActiveFilter] = useState("today");
   const [search, setSearch] = useState("");
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
-  const { bookings, loading, error } = useBookings(activeFilter, search);
+  const { bookings, loading, error, updateStatus } = useBookings(activeFilter, search);
+  const [actioningId, setActioningId] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const formatterDate = useMemo(
     () =>
@@ -67,11 +69,24 @@ function Bookings() {
     </div>
   );
 
-  const renderError = error && (
+  const renderError = (error || actionError) && (
     <div className="bg-error-50 rounded-2xl p-6 border border-error-200 text-error-700">
-      {error}
+      {error || actionError}
     </div>
   );
+
+  const handleStatusUpdate = async (booking: Booking, status: "confirmed" | "cancelled") => {
+    setActioningId(booking.id);
+    setActionError(null);
+    try {
+      const updated = await updateStatus(booking.id, status);
+      setSelectedBooking((prev) => (prev && prev.id === booking.id ? { ...prev, status: updated.status } : prev));
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Action failed");
+    } finally {
+      setActioningId(null);
+    }
+  };
 
   return (
     <div className="flex h-full min-h-screen w-full flex-col bg-default-background">

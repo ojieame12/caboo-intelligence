@@ -51,5 +51,17 @@ export function useBookings(filter: string, search: string) {
     }
   }, [user?.token, filter, search])
 
-  return useMemo(() => ({ bookings, loading, error }), [bookings, loading, error])
+  const updateStatus = async (id: string, status: 'confirmed' | 'cancelled' | 'pending') => {
+    if (!user?.token) {
+      throw new Error('Not authenticated')
+    }
+    const result = await api.put<{ booking: BookingRecord }>(`/api/bookings/${id}`, { status }, user.token)
+    setBookings((prev) => prev.map((b) => (b.id === id ? result.booking : b)))
+    return result.booking
+  }
+
+  return useMemo(
+    () => ({ bookings, loading, error, updateStatus }),
+    [bookings, loading, error],
+  )
 }

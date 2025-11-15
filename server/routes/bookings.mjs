@@ -87,4 +87,34 @@ router.post('/bookings', authenticate, async (req, res) => {
   }
 })
 
+router.put('/bookings/:id', authenticate, async (req, res) => {
+  const { restaurantId } = req.auth
+  const { id } = req.params
+  const { status } = req.body || {}
+
+  const allowed = ['pending', 'confirmed', 'cancelled']
+  if (!allowed.includes(status)) {
+    return res.status(400).json({ message: 'Invalid status' })
+  }
+
+  try {
+    const result = await pool.query(
+      `UPDATE bookings
+       SET status = $1
+       WHERE id = $2 AND restaurant_id = $3
+       RETURNING id, customer_name, customer_phone, party_size, status, source, notes, booking_time, created_at`,
+      [status, id, restaurantId],
+    )
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Booking not found' })
+    }
+
+    res.json({ booking: result.rows[0] })
+  } catch (error) {
+    console.error('Booking update error', error)
+    res.status(500).json({ message: 'Unable to update booking' })
+  }
+})
+
 export default router
