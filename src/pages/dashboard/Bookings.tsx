@@ -374,12 +374,23 @@ function Bookings() {
                     <div className="bg-neutral-100 rounded-xl p-4">
                       <p className="font-['Geist'] text-[15px] font-medium text-neutral-900 mb-2">Awaiting confirmation</p>
                       <div className="flex gap-2 mt-4">
-                        <Button variant="neutral-secondary" size="small" className="flex-1">
+                        <Button
+                          variant="neutral-secondary"
+                          size="small"
+                          className="flex-1"
+                          disabled={actioningId === selectedBooking.id}
+                          onClick={() => handleStatusUpdate(selectedBooking, "cancelled")}
+                        >
                           Decline
                         </Button>
                         <div className="flex-1 flex items-center gap-2 rounded-full bg-brand-600 px-2 py-1 btn-hover-lift">
-                          <Button size="small" className="w-full">
-                            Confirm Now
+                          <Button
+                            size="small"
+                            className="w-full"
+                            disabled={actioningId === selectedBooking.id}
+                            onClick={() => handleStatusUpdate(selectedBooking, "confirmed")}
+                          >
+                            {actioningId === selectedBooking.id ? "Updating..." : "Confirm Now"}
                           </Button>
                         </div>
                       </div>
@@ -390,10 +401,16 @@ function Bookings() {
 
               {/* Actions */}
               <div className="mt-8 pt-6 border-t border-neutral-200 space-y-3">
-                <Button variant="neutral-secondary" size="medium" className="w-full">
+                <Button variant="neutral-secondary" size="medium" className="w-full" disabled>
                   Resend Confirmation
                 </Button>
-                <Button variant="neutral-secondary" size="medium" className="w-full">
+                <Button
+                  variant="neutral-secondary"
+                  size="medium"
+                  className="w-full"
+                  disabled={actioningId === selectedBooking.id}
+                  onClick={() => handleStatusUpdate(selectedBooking, "cancelled")}
+                >
                   Cancel Booking
                 </Button>
               </div>
