@@ -4,6 +4,7 @@ import { Accordion } from "@/subframe/components/Accordion";
 import { FeatherCheck, FeatherArrowRight } from "@subframe/core";
 import { AnimatedSection, CountUp } from "./components/AnimatedSection";
 import { useAuthContext } from "@/context/AuthContext";
+import { Helmet } from "react-helmet-async";
 
 function LandingPage() {
   const { user, logout } = useAuthContext();
@@ -11,6 +12,62 @@ function LandingPage() {
 
   return (
     <div className="flex h-full w-full flex-col items-center bg-default-background">
+      <Helmet>
+        <title>Caboo – WhatsApp Booking Assistant | Reduce No-Shows</title>
+        <meta
+          name="description"
+          content="Turn your restaurant's WhatsApp into a 24/7 booking assistant. Capture every request, cut no-shows with reminders, and keep your existing number."
+        />
+        <link rel="canonical" href="https://caboo.design/" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@graph': [
+              {
+                '@type': 'Organization',
+                name: 'Caboo Intelligence (Pty) Ltd',
+                url: 'https://caboo.design',
+                contactPoint: [
+                  {
+                    '@type': 'ContactPoint',
+                    contactType: 'customer support',
+                    email: 'support@caboo.design',
+                  },
+                ],
+              },
+              {
+                '@type': 'FAQPage',
+                mainEntity: [
+                  {
+                    '@type': 'Question',
+                    name: 'Do I need a new WhatsApp number?',
+                    acceptedAnswer: {
+                      '@type': 'Answer',
+                      text: 'No. You keep your existing WhatsApp Business number and we layer automation on top.',
+                    },
+                  },
+                  {
+                    '@type': 'Question',
+                    name: 'Does this replace Dineplan?',
+                    acceptedAnswer: {
+                      '@type': 'Answer',
+                      text: 'No. We can notify you to add bookings into Dineplan or your diary, and we integrate as needed.',
+                    },
+                  },
+                  {
+                    '@type': 'Question',
+                    name: 'How do you reduce no-shows?',
+                    acceptedAnswer: {
+                      '@type': 'Answer',
+                      text: 'We send timely WhatsApp confirmations and reminders with quick replies so guests confirm or cancel before service.',
+                    },
+                  },
+                ],
+              },
+            ],
+          })}
+        </script>
+      </Helmet>
       {/* Navbar */}
       <div className="w-full border-b border-neutral-border bg-white sticky top-0 z-50 backdrop-blur-sm bg-white/90">
         <div className="flex w-full max-w-[1280px] mx-auto items-center justify-between px-4 md:px-6 py-4">

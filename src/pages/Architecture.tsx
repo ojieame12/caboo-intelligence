@@ -2,10 +2,19 @@ import React from "react";
 import { Button } from "@/subframe/components/Button";
 import { Accordion } from "@/subframe/components/Accordion";
 import { FeatherArrowRight, FeatherCheck } from "@subframe/core";
+import { Helmet } from "react-helmet-async";
 
 function Architecture() {
   return (
     <div className="flex h-full w-full flex-col items-center bg-default-background">
+      <Helmet>
+        <title>Technical Architecture | Caboo WhatsApp Booking Platform</title>
+        <meta
+          name="description"
+          content="See how Caboo runs multi-tenant WhatsApp booking automation for restaurants: Bird/Meta integration, reminders, webhooks, and security posture."
+        />
+        <link rel="canonical" href="https://caboo.design/architecture" />
+      </Helmet>
       {/* Navbar */}
       <div className="w-full border-b border-neutral-border bg-white sticky top-0 z-50">
         <div className="flex w-full max-w-[1280px] mx-auto flex-wrap items-center justify-between gap-4 px-6 py-4">

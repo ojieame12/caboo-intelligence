@@ -5,6 +5,7 @@ import { AnimatedInput, validators } from "@/components/AnimatedInput";
 import { FeatherCheck } from "@subframe/core";
 import { api } from "@/lib/api";
 import { useAuthContext } from "@/context/AuthContext";
+import { Helmet } from "react-helmet-async";
 
 type FormState = {
   restaurantName: string;
@@ -70,6 +71,14 @@ function SignUp() {
 
   return (
     <div className="flex h-full min-h-screen w-full flex-col items-center bg-default-background">
+      <Helmet>
+        <title>Sign up | Caboo WhatsApp Booking Assistant</title>
+        <meta
+          name="description"
+          content="Start your 14-day free trial. Connect your WhatsApp, capture bookings automatically, and cut no-shows with reminders."
+        />
+        <link rel="canonical" href="https://caboo.design/signup" />
+      </Helmet>
       {/* Navbar */}
       <div className="w-full border-b border-neutral-border bg-white">
         <div className="flex w-full max-w-[1280px] mx-auto flex-wrap items-center justify-between gap-4 px-6 py-4">

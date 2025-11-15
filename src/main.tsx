@@ -3,6 +3,7 @@ import { createRoot, hydrateRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 import { AuthProvider } from './context/AuthContext.tsx'
+import { HelmetProvider } from 'react-helmet-async'
 
 const isPrerender = typeof navigator !== 'undefined' && navigator.userAgent === 'ReactSnap'
 
@@ -19,9 +20,11 @@ if (container.hasChildNodes()) {
 
 const app = (
   <StrictMode>
-    <AuthProvider>
-      <App />
-    </AuthProvider>
+    <HelmetProvider>
+      <AuthProvider>
+        <App />
+      </AuthProvider>
+    </HelmetProvider>
   </StrictMode>
 )
 
