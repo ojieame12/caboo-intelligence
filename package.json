@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "server": "node server/index.mjs",
-    "postbuild": "if [ \"$VERCEL\" = \"1\" ] || [ \"$SKIP_SNAP\" = \"true\" ]; then echo \"Skipping react-snap on this build\"; else react-snap; fi",
+    "postbuild": "if [ \"$RUN_SNAP\" = \"true\" ]; then react-snap; else echo \"Skipping react-snap (set RUN_SNAP=true to enable)\"; fi",
     "preview": "vite preview"
   },
   "dependencies": {
