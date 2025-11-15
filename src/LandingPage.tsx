@@ -186,7 +186,7 @@ function LandingPage() {
       <div className="w-full px-4 md:px-6 py-4 md:py-6">
         <div className="flex min-h-[500px] md:h-144 w-full flex-col items-center justify-center gap-6 md:gap-8 rounded-2xl px-4 md:px-6 py-12 md:py-2 bg-[#FCF6EF] bg-none md:bg-[url('https://res.cloudinary.com/subframe/image/upload/v1763068410/uploads/13740/bhhmezdkrjimc9edtafq.png')] md:bg-[right_9rem_top_-9rem] md:bg-[length:600px] bg-no-repeat">
           <div className="flex w-full max-w-[1280px] flex-col items-start gap-4 md:gap-6">
-            <h1 className="font-['Season_Mix_TRIAL'] text-[36px] md:text-[48px] lg:text-[56px] font-[400] leading-[40px] md:leading-[52px] lg:leading-[60px] text-neutral-900 animate-fade-in">
+            <h1 className="max-w-[95%] md:max-w-[600px] lg:max-w-[700px] font-['Season_Mix_TRIAL'] text-[36px] md:text-[48px] lg:text-[56px] font-[400] leading-[40px] md:leading-[52px] lg:leading-[60px] text-neutral-900 animate-fade-in">
               {"Your "}
               <span className="text-[#128C7E]">WhatsApp</span>
               {". "}
@@ -194,7 +194,7 @@ function LandingPage() {
               {" "}
               <span className="block md:inline">Happier customers.</span>
             </h1>
-            <p className="max-w-[600px] font-['Geist'] text-[16px] md:text-[18px] lg:text-[20px] font-[300] leading-[26px] md:leading-[30px] lg:leading-[32px] text-neutral-600 animate-fade-in delay-200">
+            <p className="max-w-[90%] md:max-w-[500px] lg:max-w-[600px] font-['Geist'] text-[16px] md:text-[18px] lg:text-[20px] font-[300] leading-[26px] md:leading-[30px] lg:leading-[32px] text-neutral-600 animate-fade-in delay-200">
               Automated WhatsApp booking assistant for South African restaurants.
               Never miss a request. Cut no-shows by 91%. Keep your existing number.
             </p>
@@ -384,11 +384,11 @@ function LandingPage() {
       {/* Features */}
       <div className="w-full py-16 md:py-24 lg:py-32 px-4 md:px-6 bg-[#FCF6EF] bg-none md:bg-[url('https://res.cloudinary.com/subframe/image/upload/v1763074076/uploads/13740/yaaf7xczdif74hxwedcb.png')] md:bg-[right_-10rem_bottom_-10rem] md:bg-[length:800px] lg:bg-[length:1200px] bg-no-repeat">
         <div className="max-w-[1280px] mx-auto">
-          <div className="mb-12 md:mb-16 lg:mb-20">
+          <div className="mb-12 md:mb-16 lg:mb-20 max-w-[95%] md:max-w-[700px]">
             <h2 className="font-['Season_Mix_TRIAL'] text-[32px] md:text-[40px] lg:text-[48px] font-[400] leading-[36px] md:leading-[44px] lg:leading-[52px] text-neutral-900 mb-4 md:mb-6">
               Built for how you actually work
             </h2>
-            <p className="font-['Geist'] text-[16px] md:text-[17px] lg:text-[18px] font-[300] leading-[26px] md:leading-[28px] lg:leading-[30px] text-neutral-600 max-w-[600px]">
+            <p className="font-['Geist'] text-[16px] md:text-[17px] lg:text-[18px] font-[300] leading-[26px] md:leading-[28px] lg:leading-[30px] text-neutral-600">
               One subscription includes everything. No add-ons, no complexity,
               no learning curve. Just intelligent WhatsApp booking management that fits
               into your restaurant's existing workflow.
