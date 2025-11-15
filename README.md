@@ -141,7 +141,10 @@ VITE_API_BASE_URL=http://localhost:3000  # Backend API URL (dev)
 NEON_DATABASE_URL=postgresql://user:pass@host/db
 AUTH_SECRET=your-random-secret-string-here
 PORT=3000
-CORS_ORIGIN=https://caboo.design
+CLIENT_ORIGIN=https://caboo.design
+NODE_ENV=production
+ENABLE_REMINDERS=true
+ZOHO_SMTP_PASSWORD=your-zoho-password
 ```
 
 ---
@@ -311,28 +314,41 @@ npm run build
 
 ## 📋 Pre-Launch Checklist
 
-### Meta Business Verification
+### Infrastructure (COMPLETED ✅)
+- [x] Neon database deployed and schema applied
+- [x] Backend API deployed to Railway
+- [x] Frontend deployed to Vercel (caboo.design)
+- [x] Environment variables configured
+- [x] Full stack connected and working
+- [x] Zoho email (support@caboo.design) configured
+- [x] Social preview image (og-image.png)
+- [x] SEO optimization complete
+
+### Meta Business Verification (READY TO APPLY)
 - [x] Professional website (caboo.design)
 - [x] Privacy Policy (POPIA compliant)
 - [x] Terms of Service
 - [x] Company registration (2025/868763/07)
+- [x] Email: support@caboo.design (working)
 - [x] Clear use case documented
 - [ ] Submit application
 
-### Bird ISV Program
+### Bird ISV Program (READY TO APPLY)
 - [x] Technical architecture page (/architecture)
 - [x] Multi-tenant design documented
 - [x] Business model clear (R599/month)
 - [x] Security measures outlined
+- [x] Backend conversation engine built
+- [x] Webhook handler ready
 - [ ] Create Bird account
 - [ ] Submit ISV application
 
-### Backend Deployment
-- [ ] Apply schema.sql to Neon
-- [ ] Deploy server/ to Railway/Render
-- [ ] Set environment variables
-- [ ] Test API endpoints
-- [ ] Connect frontend to backend
+### Current Status
+- ✅ Beta waitlist live (signup → "we'll contact you")
+- ✅ Dashboard functional (with Neon data)
+- ✅ Contact form working (Zoho SMTP)
+- ✅ Reminder cron scheduled
+- ⏳ Waiting for Meta/Bird approval to activate WhatsApp
 
 ---
 
